@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Odyssey", "Odyssey.csproj", "{236A5397-9125-42AE-8790-3903ACFAAA92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Odyssey", "Odyssey\Odyssey.csproj", "{236A5397-9125-42AE-8790-3903ACFAAA92}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Odyseey.Tests", "..\SmartContainer.Tests\Odyseey.Tests.csproj", "{73733910-A11F-4A6E-A223-3B104692B8AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Odyssey.Tests", "Odyssey.Tests\Odyssey.Tests.csproj", "{73733910-A11F-4A6E-A223-3B104692B8AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

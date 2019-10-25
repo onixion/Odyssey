@@ -1,4 +1,5 @@
-﻿using SmartContainer.Contracts;
+﻿using Odyssey.Core;
+using SmartContainer.Contracts;
 using SmartContainer.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace SmartContainer.Core
         /// <note>
         /// Key should be "type" and "name".
         /// </note>
-        readonly IDictionary<Type, IList<Registration>> knownTypes = new Dictionary<Type, IList<Registration>>();
+        readonly IDictionary<Type, IList<TypeRegistration>> knownTypes = new Dictionary<Type, IList<TypeRegistration>>();
 
         /// <summary>
         /// Constructor.
@@ -33,17 +34,17 @@ namespace SmartContainer.Core
         {
             foreach(Registration registration in registrations.Registrations)
             {
-                if(knownTypes.TryGetValue(registration.InterfaceType, out IList<Registration> listRegistrations))
+                if(knownTypes.TryGetValue(registration.InterfaceType, out IList<TypeRegistration> listRegistrations))
                 {
                     // Check if name is already used.
-                    if (listRegistrations.Any(reg => reg.Name == registration.Name))
+                    if (listRegistrations.Any(reg => reg.Registration.Name == registration.Name))
                         throw new RegisterException($"Could not register {registration}: name '{registration.Name}' already registered.");
 
-                    listRegistrations.Add(registration);
+                    listRegistrations.Add(new TypeRegistration(registration));
                 }
                 else
                 {
-                    knownTypes.Add(registration.InterfaceType, new List<Registration> { registration });
+                    knownTypes.Add(registration.InterfaceType, new List<TypeRegistration> { new TypeRegistration(registration) });
                 }
             }
         }
@@ -53,27 +54,27 @@ namespace SmartContainer.Core
         /// </summary>
         /// <param name="interfaceType"></param>
         /// <param name="name"></param>
-        /// <param name="registration"></param>
+        /// <param name="typeRegistration"></param>
         /// <returns></returns>
-        public bool TryResolve(Type interfaceType, string name, out Registration registration)
+        public bool TryResolve(Type interfaceType, string name, out TypeRegistration typeRegistration)
         {
-            if (!knownTypes.TryGetValue(interfaceType, out IList<Registration> registrations))
+            if (!knownTypes.TryGetValue(interfaceType, out IList<TypeRegistration> typeRegistrations))
             {
-                registration = null;
+                typeRegistration = null;
                 return false;
             }
             else
             {
-                var foundRegistration = registrations.FirstOrDefault(reg => reg.Name == name);
+                var foundRegistration = typeRegistrations.FirstOrDefault(reg => reg.Registration.Name == name);
 
                 if (foundRegistration == null)
                 {
-                    registration = null;
+                    typeRegistration = null;
                     return false;
                 }
                 else
                 {
-                    registration = foundRegistration;
+                    typeRegistration = foundRegistration;
                     return true;
                 }
             }

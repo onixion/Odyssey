@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartContainer\Odyssey.csproj" />
+    <ProjectReference Include="..\Odyssey\Odyssey.csproj" />
   </ItemGroup>
 
 </Project>
