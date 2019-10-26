@@ -25,6 +25,15 @@ namespace SmartContainer.Contracts
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="value">Value.</param>
+        public ParameterInjection(object value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <param name="value"></param>

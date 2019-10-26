@@ -14,12 +14,19 @@ namespace Odyssey.Contracts
         public Type InterfaceType { get; }
 
         /// <summary>
+        /// Name.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="interfaceType">Interface type.</param>
-        public PropertyDependency(Type interfaceType)
+        /// <param name="name">Name.</param>
+        public PropertyDependency(Type interfaceType = null, string name = null)
         {
             InterfaceType = interfaceType;
+            Name = name;
         }
     }
 }

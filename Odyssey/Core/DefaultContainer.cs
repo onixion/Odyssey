@@ -1,6 +1,8 @@
-﻿using SmartContainer.Contracts;
+﻿using Odyssey.Core;
+using SmartContainer.Contracts;
 using SmartContainer.Exceptions;
 using System;
+using System.Collections.Generic;
 
 namespace SmartContainer.Core
 {
@@ -24,7 +26,7 @@ namespace SmartContainer.Core
         /// </summary>
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
-        public DefaultContainer(IRegistrations registrations, IContainer parentContainer = null)
+        public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
         {
             typeRegistry = new TypeRegistry(registrations);
             this.parentContainer = parentContainer;
@@ -36,7 +38,7 @@ namespace SmartContainer.Core
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
         /// <returns>Container.</returns>
-        public IContainer CreateContainer(IRegistrations registrations, IContainer parentContainer = null)
+        public IContainer CreateContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
         {
             if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
             return new DefaultContainerCreator().CreateContainer(registrations, parentContainer);
@@ -51,7 +53,8 @@ namespace SmartContainer.Core
         {
             if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
 
-            if (!typeRegistry.TryResolve(resolution.InterfaceType, resolution.Name, out Registration registration))
+            // Get type registration.
+            if (!typeRegistry.TryResolve(resolution.InterfaceType, resolution.Name, out TypeRegistration typeRegistration))
             {
                 if (parentContainer != null)
                     return parentContainer.Resolve(resolution);
@@ -59,8 +62,7 @@ namespace SmartContainer.Core
                 throw new ResolveException($"Could not resolve {resolution}: matching registration not found.");
             }
 
-            // TODO
-            throw new NotImplementedException();
+            return typeRegistry.GetServiceInstance(typeRegistration, resolution, this);
         }
 
         /// <summary>

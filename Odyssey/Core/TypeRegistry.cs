@@ -1,9 +1,11 @@
 ﻿using Odyssey.Core;
 using SmartContainer.Contracts;
+using SmartContainer.Core.Builders;
 using SmartContainer.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SmartContainer.Core
 {
@@ -30,9 +32,9 @@ namespace SmartContainer.Core
         /// Constructor.
         /// </summary>
         /// <param name="registrations">Registrations.</param>
-        public TypeRegistry(IRegistrations registrations)
+        public TypeRegistry(IEnumerable<Registration> registrations)
         {
-            foreach(Registration registration in registrations.Registrations)
+            foreach(Registration registration in registrations)
             {
                 if(knownTypes.TryGetValue(registration.InterfaceType, out IList<TypeRegistration> listRegistrations))
                 {
@@ -78,6 +80,119 @@ namespace SmartContainer.Core
                     return true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Get service instance.
+        /// </summary>
+        /// <param name="typeRegistration"></param>
+        /// <param name="resolution"></param>
+        /// <param name="resolver"></param>
+        /// <returns></returns>
+        public object GetServiceInstance(TypeRegistration typeRegistration, Resolution resolution, IResolver resolver)
+        {
+            switch(typeRegistration.Registration.Lifetime ?? Lifetime.CreateOnes)
+            {
+                case Lifetime.CreateOnes:
+
+                    if(typeRegistration.RuntimeMetaData.Instance == null)
+                    {
+                        typeRegistration.RuntimeMetaData.Instance =
+                            CreateInstanceFromRegistration(typeRegistration, resolver);
+                    }
+
+                    return typeRegistration.RuntimeMetaData.Instance;
+
+                case Lifetime.CreateOnResolve:
+
+                    return CreateInstanceFromResolution(typeRegistration, resolution, resolver);
+
+                default:
+                    throw new RegisterException($"Lifetime {typeRegistration.Registration.Lifetime} not known.");
+            }
+        }
+
+        /// <summary>
+        /// Creates instance from registration only.
+        /// </summary>
+        /// <param name="typeRegistration">Registration.</param>
+        /// <param name="resolver">Resolver.</param>
+        /// <returns>Service instance.</returns>
+        public object CreateInstanceFromRegistration(TypeRegistration typeRegistration, IResolver resolver)
+        {
+            object instance = null;
+
+            if(typeRegistration.Registration.ParameterInjections == null)
+            {
+                instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+            }
+            else
+            {
+                instance = Activator.CreateInstance(
+                    typeRegistration.Registration.ImplementationType,
+                    typeRegistration.Registration.ParameterInjections.Select(par => par.Value).ToArray());
+            }
+
+            /*
+            foreach (PropertyInfo propertyInfo in PropertyInfos)
+            {
+                Resolution resolution = new ResolutionBuilder()
+                    .SetInterfaceType(propertyInfo.PropertyType)
+                    //.SetName()
+                    .Build();
+
+                propertyInfo.SetValue(instance, resolver.Resolve(resolution));
+            }*/
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Create instance from resolution (and registration).
+        /// </summary>
+        /// <param name="typeRegistration"></param>
+        /// <param name="resolution"></param>
+        /// <param name="resolver"></param>
+        /// <returns>Service instance.</returns>
+        public object CreateInstanceFromResolution(TypeRegistration typeRegistration, Resolution resolution, IResolver resolver)
+        {
+            object instance = null;
+
+            // If paramter injections are defined in the resolution,
+            // then use them.
+            if (resolution.ParameterInjections != null)
+            {
+                instance = Activator.CreateInstance(
+                    typeRegistration.Registration.ImplementationType,
+                    resolution.ParameterInjections.Select(par => par.Value).ToArray());
+            }
+            // If not, take them from the registration.
+            else
+            {
+                if (typeRegistration.Registration.ParameterInjections == null)
+                {
+                    instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+                }
+                else
+                {
+                    instance = Activator.CreateInstance(
+                        typeRegistration.Registration.ImplementationType,
+                        typeRegistration.Registration.ParameterInjections.Select(par => par.Value).ToArray());
+                }
+            }
+
+            /*
+            foreach (PropertyInfo propertyInfo in typeRegistration.RuntimeMetaData.PropertyInfos)
+            {
+                Resolution propertyResolution = new ResolutionBuilder()
+                    .SetInterfaceType(propertyInfo.PropertyType)
+                    //.SetName()
+                    .Build();
+
+                propertyInfo.SetValue(instance, resolver.Resolve(propertyResolution));
+            }*/
+
+            return instance;
         }
     }
 }

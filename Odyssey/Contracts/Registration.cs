@@ -55,19 +55,23 @@ namespace SmartContainer.Contracts
         public Registration(
             Type interfaceType, 
             Type implementationType, 
-            Lifetime? lifetime, 
-            object instance, 
-            string name,
-            ParameterInjection[] parameterInjections,
-            PropertyInjection[] propertyInjections)
+            Lifetime? lifetime = null, 
+            object instance = null, 
+            string name = null,
+            ParameterInjection[] parameterInjections = null,
+            PropertyInjection[] propertyInjections = null)
         {
             InterfaceType = interfaceType;
             ImplementationType = implementationType;
             Lifetime = lifetime;
             Instance = instance;
             Name = name;
-            ParameterInjections = (ParameterInjection[]) parameterInjections.Clone();
-            PropertyInjections = (PropertyInjection[]) propertyInjections.Clone();
+
+            if(parameterInjections != null)
+                ParameterInjections = (ParameterInjection[]) parameterInjections.Clone();
+
+            if(propertyInjections != null)
+                PropertyInjections = (PropertyInjection[]) propertyInjections.Clone();
         }
     }
 }

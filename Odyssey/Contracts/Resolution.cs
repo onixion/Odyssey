@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartContainer.Contracts
 {
@@ -20,12 +22,12 @@ namespace SmartContainer.Contracts
         /// <summary>
         /// Parameter injections.
         /// </summary>
-        public ParameterInjection[] ParameterInjections { get; }
+        public IEnumerable<ParameterInjection> ParameterInjections { get; }
 
         /// <summary>
         /// Property injections.
         /// </summary>
-        public PropertyInjection[] PropertyInjections { get; }
+        public IEnumerable<PropertyInjection> PropertyInjections { get; }
 
         /// <summary>
         /// Constructor.
@@ -34,12 +36,20 @@ namespace SmartContainer.Contracts
         /// <param name="name"></param>
         /// <param name="parameterInjections"></param>
         /// <param name="propertyInjections"></param>
-        public Resolution(Type interfaceType, string name, ParameterInjection[] parameterInjections, PropertyInjection[] propertyInjections)
+        public Resolution(
+            Type interfaceType, 
+            string name = null, 
+            IEnumerable<ParameterInjection> parameterInjections = null,
+            IEnumerable<PropertyInjection> propertyInjections = null)
         {
             InterfaceType = interfaceType;
             Name = name;
-            ParameterInjections = (ParameterInjection[]) parameterInjections.Clone();
-            PropertyInjections = (PropertyInjection[]) propertyInjections.Clone();
+
+            if (parameterInjections != null)
+                ParameterInjections = parameterInjections.ToArray();
+
+            if (propertyInjections != null)
+                PropertyInjections = propertyInjections.ToArray();
         }
     }
 }

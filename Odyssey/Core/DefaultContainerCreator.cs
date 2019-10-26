@@ -1,4 +1,5 @@
 ﻿using SmartContainer.Contracts;
+using System.Collections.Generic;
 
 namespace SmartContainer.Core
 {
@@ -13,7 +14,7 @@ namespace SmartContainer.Core
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
         /// <returns>Container.</returns>
-        public IContainer CreateContainer(IRegistrations registrations, IContainer parentContainer = null)
+        public IContainer CreateContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
         {
             return new DefaultContainer(registrations, parentContainer);
         }

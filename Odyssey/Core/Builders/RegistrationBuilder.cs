@@ -115,13 +115,26 @@ namespace SmartContainer.Core.Builders
         /// </summary>
         /// <param name="parameterName">Parameter name.</param>
         /// <param name="value">Value of parameter.</param>
-        /// <returns></returns>
+        /// <returns>Registration builder.</returns>
         /// <remarks>
         /// Is optional and only supported when life time is set to Lifetime.CreateOnce.
         /// </remarks>
         public RegistrationBuilder AddParameterInjection(string parameterName, object value)
         {
             parameterInjections.Add(new ParameterInjection(parameterName, null, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Add parameter injections.
+        /// </summary>
+        /// <param name="parameterInjections">Parameter injections.</param>
+        /// <returns>Registration builder.</returns>
+        public RegistrationBuilder AddParameterInjections(IEnumerable<ParameterInjection> parameterInjections)
+        {
+            foreach (ParameterInjection parameterInjection in parameterInjections)
+                this.parameterInjections.Add(parameterInjection);
+
             return this;
         }
 
@@ -142,6 +155,19 @@ namespace SmartContainer.Core.Builders
         public RegistrationBuilder AddPropertyInjection(string propertyName, object value)
         {
             propertyInjections.Add(new PropertyInjection(propertyName, null, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Add property injections.
+        /// </summary>
+        /// <param name="propertyInjections">Property injections.</param>
+        /// <returns>Registration builder.</returns>
+        public RegistrationBuilder AddPropertyInjections(IEnumerable<PropertyInjection> propertyInjections)
+        {
+            foreach (PropertyInjection propertyInjection in propertyInjections)
+                this.propertyInjections.Add(propertyInjection);
+
             return this;
         }
 
