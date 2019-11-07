@@ -29,6 +29,7 @@ namespace SmartContainer.Core
         public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
         {
             typeRegistry = new TypeRegistry(registrations);
+            typeRegistry.Initialize(this);
             this.parentContainer = parentContainer;
         }
 

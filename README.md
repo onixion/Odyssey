@@ -1,2 +1,3 @@
-# Odyssey
-Dependency injection framework.
+![Odyssey](Assets/logo.jpg)
+
+Written by Alin Andersen.

@@ -52,6 +52,24 @@ namespace SmartContainer.Core
         }
 
         /// <summary>
+        /// Initialize registrations.
+        /// </summary>
+        /// <param name="resolver"></param>
+        public void Initialize(IResolver resolver)
+        {
+            foreach(IList<TypeRegistration> typeRegistrations in knownTypes.Values)
+            {
+                foreach(TypeRegistration typeRegistration in typeRegistrations)
+                {
+                    if (!typeRegistration.Registration.CreateOnResolve)
+                    {
+                        typeRegistration.RuntimeMetaData.Instance = CreateInstanceFromRegistration(typeRegistration, resolver);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Try resolve.
         /// </summary>
         /// <param name="interfaceType"></param>
@@ -91,24 +109,13 @@ namespace SmartContainer.Core
         /// <returns></returns>
         public object GetServiceInstance(TypeRegistration typeRegistration, Resolution resolution, IResolver resolver)
         {
-            switch(typeRegistration.Registration.Lifetime ?? Lifetime.CreateOnes)
+            if(typeRegistration.Registration.CreateOnResolve)
             {
-                case Lifetime.CreateOnes:
-
-                    if(typeRegistration.RuntimeMetaData.Instance == null)
-                    {
-                        typeRegistration.RuntimeMetaData.Instance =
-                            CreateInstanceFromRegistration(typeRegistration, resolver);
-                    }
-
-                    return typeRegistration.RuntimeMetaData.Instance;
-
-                case Lifetime.CreateOnResolve:
-
-                    return CreateInstanceFromResolution(typeRegistration, resolution, resolver);
-
-                default:
-                    throw new RegisterException($"Lifetime {typeRegistration.Registration.Lifetime} not known.");
+                return CreateInstanceFromResolution(typeRegistration, resolution, resolver);
+            }
+            else
+            {
+                return typeRegistration.RuntimeMetaData.Instance;
             }
         }
 
@@ -133,6 +140,7 @@ namespace SmartContainer.Core
                     typeRegistration.Registration.ParameterInjections.Select(par => par.Value).ToArray());
             }
 
+            // TODO
             /*
             foreach (PropertyInfo propertyInfo in PropertyInfos)
             {

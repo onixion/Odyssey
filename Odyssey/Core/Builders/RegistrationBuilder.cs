@@ -49,21 +49,21 @@ namespace SmartContainer.Core.Builders
         }
 
         /// <summary>
-        /// Life time.
+        /// Create on resolve.
         /// </summary>
-        Lifetime? lifetime;
+        bool createOnResolve;
 
         /// <summary>
         /// Set lifetime.
         /// </summary>
-        /// <param name="lifetime">Life time.</param>
+        /// <param name="createOnResolve">Create on resolve.</param>
         /// <returns>Registration builder.</returns>
         /// <remarks>
         /// Is optional and default is Lifetime.CreateOnce.
         /// </remarks>
-        public RegistrationBuilder SetLifetime(Lifetime lifetime)
+        public RegistrationBuilder SetCreateOnResolve(bool createOnResolve)
         {
-            this.lifetime = lifetime;
+            this.createOnResolve = createOnResolve;
             return this;
         }
 
@@ -177,7 +177,7 @@ namespace SmartContainer.Core.Builders
         /// <returns>Registration.</returns>
         public Registration Build()
         {
-            return new Registration(interfaceType, implementationType, lifetime, instance, name, parameterInjections.ToArray(), propertyInjections.ToArray());
+            return new Registration(interfaceType, implementationType, createOnResolve, instance, name, parameterInjections.ToArray(), propertyInjections.ToArray());
         }
     }
 }

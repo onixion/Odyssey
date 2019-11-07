@@ -57,7 +57,7 @@ namespace Odyssey.Tests.Core
         {
             IList<Registration> registrations = new List<Registration>
             {
-                new Registration(typeof(ICar), typeof(Bmw), Lifetime.CreateOnResolve),
+                new Registration(typeof(ICar), typeof(Bmw), true),
             };
 
             using (IContainer container = new DefaultContainer(registrations))
@@ -146,7 +146,7 @@ namespace Odyssey.Tests.Core
                 new Registration(
                     typeof(IComputer),
                     typeof(LenovoT420),
-                    Lifetime.CreateOnResolve),
+                    true),
             };
 
             using (IContainer container = new DefaultContainer(registrations))
@@ -159,6 +159,36 @@ namespace Odyssey.Tests.Core
 
                 Assert.IsNotNull(computer.Battery);
                 Assert.IsTrue(computer.Battery.GetType() == typeof(LithiumIonBattery));
+            }
+        }
+
+        /// <summary>
+        /// Test resolve from parent container.
+        /// </summary>
+        [TestMethod]
+        public void TestParentResolve()
+        {
+            var bmw = new Bmw();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(ICar),
+                    typeof(Bmw),
+                    instance: bmw),
+            };
+
+            using (IContainer parentContainer = new DefaultContainer(registrations))
+            {
+                using (IContainer container = new DefaultContainer(new List<Registration>(), parentContainer))
+                {
+                    ICar car = (ICar)container.Resolve( new Resolution(typeof(ICar)));
+
+                    Assert.IsNotNull(car);
+                    Assert.IsTrue(car.GetType() == typeof(Bmw));
+                    // FIX THIS
+                    //Assert.IsTrue(car == bmw);
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartContainer.Exceptions;
+using System;
 
 namespace SmartContainer.Contracts
 {
@@ -18,10 +19,10 @@ namespace SmartContainer.Contracts
         public Type ImplementationType { get; }
 
         /// <summary>
-        /// Life time.
+        /// Create on resolve.
         /// </summary>
-        public Lifetime? Lifetime { get; }
-
+        public bool CreateOnResolve { get; }
+  
         /// <summary>
         /// Instance.
         /// </summary>
@@ -47,7 +48,7 @@ namespace SmartContainer.Contracts
         /// </summary>
         /// <param name="interfaceType"></param>
         /// <param name="implementationType"></param>
-        /// <param name="lifetime"></param>
+        /// <param name="createOnResolve"></param>
         /// <param name="instance"></param>
         /// <param name="name"></param>
         /// <param name="parameterInjections"></param>
@@ -55,7 +56,7 @@ namespace SmartContainer.Contracts
         public Registration(
             Type interfaceType, 
             Type implementationType, 
-            Lifetime? lifetime = null, 
+            bool createOnResolve = false,
             object instance = null, 
             string name = null,
             ParameterInjection[] parameterInjections = null,
@@ -63,15 +64,35 @@ namespace SmartContainer.Contracts
         {
             InterfaceType = interfaceType;
             ImplementationType = implementationType;
-            Lifetime = lifetime;
-            Instance = instance;
-            Name = name;
+            CreateOnResolve = createOnResolve;
 
-            if(parameterInjections != null)
-                ParameterInjections = (ParameterInjection[]) parameterInjections.Clone();
+            // When create on resolve is true, many other fields make no sense.
+            // This if will prevent all those cases from beeing possible.
+            if (createOnResolve)
+            {
+                if (instance != null)
+                    throw new RegisterException($"Registration can't define an instance when CreateOnResolve is true.");
 
-            if(propertyInjections != null)
-                PropertyInjections = (PropertyInjection[]) propertyInjections.Clone();
+                if (name != null)
+                    throw new RegisterException($"Registration can't define an name when CreateOnResolve is true.");
+
+                if (parameterInjections != null)
+                    throw new RegisterException($"Registration can't define parameter injections when CreateOnResolve is true.");
+
+                if (propertyInjections != null)
+                    throw new RegisterException($"Registration can't define property injections when CreateOnResolve is true.");
+            }
+            else
+            {
+                Instance = instance;
+                Name = name;
+
+                if (parameterInjections != null)
+                    ParameterInjections = (ParameterInjection[])parameterInjections.Clone();
+
+                if (propertyInjections != null)
+                    PropertyInjections = (PropertyInjection[])propertyInjections.Clone();
+            }
         }
     }
 }
