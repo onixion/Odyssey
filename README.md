@@ -1,3 +1,3 @@
-![Odyssey](Assets/logo.jpg)
+![Odyssey](Assets/logo.png)
 
 Written by Alin Andersen.
