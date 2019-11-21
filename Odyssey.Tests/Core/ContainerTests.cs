@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SmartContainer.Contracts;
-using SmartContainer.Core;
+using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
 namespace Odyssey.Tests.Core

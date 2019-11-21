@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SmartContainer.Contracts
+namespace Odyssey.Contracts
 {
     /// <summary>
     /// Container creator interface.

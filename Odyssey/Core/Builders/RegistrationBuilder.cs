@@ -1,9 +1,9 @@
-﻿using SmartContainer.Contracts;
+﻿using Odyssey.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmartContainer.Core.Builders
+namespace Odyssey.Core.Builders
 {
     /// <summary>
     /// Registration builder.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmartContainer.Exceptions
+namespace Odyssey.Exceptions
 {
     /// <summary>
     /// Register exception.

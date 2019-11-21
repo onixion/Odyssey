@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmartContainer.Contracts
+namespace Odyssey.Contracts
 {
     /// <summary>
     /// Property injection.

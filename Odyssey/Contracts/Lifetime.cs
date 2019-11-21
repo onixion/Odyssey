@@ -1,4 +1,4 @@
-﻿namespace SmartContainer.Contracts
+﻿namespace Odyssey.Contracts
 {
     /// <summary>
     /// Life time.

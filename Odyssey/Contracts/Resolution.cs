@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmartContainer.Contracts
+namespace Odyssey.Contracts
 {
     /// <summary>
     /// Resolution.

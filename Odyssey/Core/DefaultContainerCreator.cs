@@ -1,7 +1,7 @@
-﻿using SmartContainer.Contracts;
+﻿using Odyssey.Contracts;
 using System.Collections.Generic;
 
-namespace SmartContainer.Core
+namespace Odyssey.Core
 {
     /// <summary>
     /// Defaault container creator.

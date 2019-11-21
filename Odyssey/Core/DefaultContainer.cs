@@ -1,10 +1,10 @@
 ﻿using Odyssey.Core;
-using SmartContainer.Contracts;
-using SmartContainer.Exceptions;
+using Odyssey.Contracts;
+using Odyssey.Exceptions;
 using System;
 using System.Collections.Generic;
 
-namespace SmartContainer.Core
+namespace Odyssey.Core
 {
     /// <summary>
     /// Implementation of smart container.

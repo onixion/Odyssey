@@ -1,7 +1,7 @@
-﻿using SmartContainer.Exceptions;
+﻿using Odyssey.Exceptions;
 using System;
 
-namespace SmartContainer.Contracts
+namespace Odyssey.Contracts
 {
     /// <summary>
     /// Registration.
