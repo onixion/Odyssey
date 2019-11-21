@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>Contoso.Utility.UsefulStuff</id>
+        <version>1.0.0</version>
+        <authors>Alin Andersen</authors>
+        <owners>onixion</owners>
+        <projectUrl>https://github.com/onixion/Odyssey</projectUrl>
+        <license type="expression">Apache-2.0</license>
+        <iconUrl>http://github.com/contoso/UsefulStuff/nuget_icon.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <releaseNotes>Initial release.</releaseNotes>
+        <description>Inverse of Control Container framework.</description>
+        <copyright>Copyright ©2019 Alin Andersen</copyright>
+        <tags>ioc container injection framework odyssey</tags>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="9.0" />
+        </dependencies>
+    </metadata>
+</package>

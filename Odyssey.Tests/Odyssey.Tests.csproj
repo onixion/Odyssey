@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Authors>Alin Andersen</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +16,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Odyssey\Odyssey.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\Builders\" />
   </ItemGroup>
 
 </Project>

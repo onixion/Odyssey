@@ -2,6 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Copyright></Copyright>
+    <PackageProjectUrl>https://github.com/onixion/Odyssey</PackageProjectUrl>
+    <Authors>Alin Andersen</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Company />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>ioc container odyssey inversion control framework</PackageTags>
+    <Description>An inversion of control container framework.</Description>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/onixion/Odyssey</RepositoryUrl>
+    <PackageReleaseNotes>First version of Odyssey framework.</PackageReleaseNotes>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageIconUrl>https://github.com/onixion/Odyssey/blob/master/Assets/nuget_logo.png?raw=true</PackageIconUrl>
   </PropertyGroup>
 
 </Project>
