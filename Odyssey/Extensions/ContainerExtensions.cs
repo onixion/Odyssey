@@ -7,7 +7,7 @@ namespace Odyssey.Extensions
     /// <summary>
     /// Resolver extensions.
     /// </summary>
-    public static class ResolverExtensions
+    public static class ContainerExtensions
     {
         /// <summary>
         /// Resolve.
@@ -19,14 +19,18 @@ namespace Odyssey.Extensions
         /// <param name="propertyInjections">Property injections.</param>
         /// <returns>Service.</returns>
         public static TInterface Resolve<TInterface>(
-            this IResolver resolver, 
+            this IContainer container, 
             string name = null, 
             IEnumerable<ParameterInjection> parameterInjections = null,
             IEnumerable<PropertyInjection> propertyInjections = null)
         {
-            var resolutionBuilder = new ResolutionBuilder()
-                .SetInterfaceType(typeof(TInterface))
-                .SetName(name ?? "");
+            var resolutionBuilder = new ResolutionBuilder
+            {
+                InterfaceType = typeof(TInterface),
+            };
+
+            if (name != null)
+                resolutionBuilder.Name = name;
 
             if (parameterInjections != null)
             {
@@ -40,7 +44,7 @@ namespace Odyssey.Extensions
                     resolutionBuilder.AddPropertyInjection(propertyInjection);
             }
 
-            return (TInterface) resolver.Resolve(resolutionBuilder.Build());
+            return (TInterface) container.Resolve(resolutionBuilder.Build());
         }
     }
 }

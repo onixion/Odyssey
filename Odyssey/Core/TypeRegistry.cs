@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics;
+using System.Text;
 
 namespace Odyssey.Core
 {
@@ -55,7 +57,7 @@ namespace Odyssey.Core
         /// Initialize registrations.
         /// </summary>
         /// <param name="resolver"></param>
-        public void Initialize(IResolver resolver)
+        public void Initialize(IContainer container)
         {
             foreach(IList<TypeRegistration> typeRegistrations in knownTypes.Values)
             {
@@ -63,7 +65,10 @@ namespace Odyssey.Core
                 {
                     if (!typeRegistration.Registration.CreateOnResolve)
                     {
-                        typeRegistration.RuntimeMetaData.Instance = CreateInstanceFromRegistration(typeRegistration, resolver);
+                        if(typeRegistration.Registration.Instance != null)
+                            continue;
+
+                        typeRegistration.RuntimeMetaData.Instance = CreateInstanceFromRegistration(typeRegistration, container);
                     }
                 }
             }
@@ -105,13 +110,16 @@ namespace Odyssey.Core
         /// </summary>
         /// <param name="typeRegistration"></param>
         /// <param name="resolution"></param>
-        /// <param name="resolver"></param>
+        /// <param name="container"></param>
         /// <returns></returns>
-        public object GetServiceInstance(TypeRegistration typeRegistration, Resolution resolution, IResolver resolver)
+        public object GetServiceInstance(TypeRegistration typeRegistration, Resolution resolution, IContainer container)
         {
-            if(typeRegistration.Registration.CreateOnResolve)
+            if (typeRegistration.Registration.Instance != null)
+                return typeRegistration.Registration.Instance;
+
+            if (typeRegistration.Registration.CreateOnResolve)
             {
-                return CreateInstanceFromResolution(typeRegistration, resolution, resolver);
+                return CreateInstanceFromResolution(typeRegistration, resolution, container);
             }
             else
             {
@@ -123,13 +131,45 @@ namespace Odyssey.Core
         /// Creates instance from registration only.
         /// </summary>
         /// <param name="typeRegistration">Registration.</param>
-        /// <param name="resolver">Resolver.</param>
+        /// <param name="container">Container.</param>
         /// <returns>Service instance.</returns>
-        public object CreateInstanceFromRegistration(TypeRegistration typeRegistration, IResolver resolver)
+        public object CreateInstanceFromRegistration(TypeRegistration typeRegistration, IContainer container)
         {
-            object instance = null;
-
             var parameterInfos = typeRegistration.RuntimeMetaData.ConstructorInfo.GetParameters();
+            var parameters = SetupParameters(parameterInfos, container, typeRegistration.Registration.ParameterInjections);
+
+            var instance = InstantiateService(typeRegistration.Registration.ImplementationType, parameters);
+            SetupProperties(typeRegistration.RuntimeMetaData.PropertyInfos, container, instance, typeRegistration.Registration.PropertyInjections);
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Create instance from resolution (and registration).
+        /// </summary>
+        /// <param name="typeRegistration"></param>
+        /// <param name="resolution"></param>
+        /// <param name="container"></param>
+        /// <returns>Service instance.</returns>
+        public object CreateInstanceFromResolution(TypeRegistration typeRegistration, Resolution resolution, IContainer container)
+        {
+            var parameterInfos = typeRegistration.RuntimeMetaData.ConstructorInfo.GetParameters();
+            var parameters = SetupParameters(parameterInfos, container, resolution.ParameterInjections);
+
+            var instance = InstantiateService(typeRegistration.Registration.ImplementationType, parameters);
+            SetupProperties(typeRegistration.RuntimeMetaData.PropertyInfos, container, instance, resolution.PropertyInjections);
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Setup parameters.
+        /// </summary>
+        object[] SetupParameters(
+            ParameterInfo[] parameterInfos,
+            IContainer container,
+            IEnumerable<ParameterInjection> parameterInjections)
+        {
             var parameters = new object[parameterInfos.Length];
 
             // This loop will first try to inject a named parameter value (if there is one).
@@ -139,7 +179,7 @@ namespace Odyssey.Core
                 var parameterInfo = parameterInfos[i];
 
                 // If a named parameter injection is found, use it.
-                if (typeRegistration.Registration.ParameterInjections.TryGetParameterInjection(parameterInfo, out ParameterInjection parameterInjection))
+                if (parameterInjections.TryGetParameterInjection(parameterInfo, out ParameterInjection parameterInjection))
                 {
                     parameters[i] = parameterInjection.Value;
                     continue;
@@ -148,17 +188,32 @@ namespace Odyssey.Core
                 // If the parameter has the attribute, resolve it.
                 if (parameterInfo.CustomAttributes.Any(customAttributeData => customAttributeData.AttributeType == typeof(Resolve)))
                 {
-                    parameters[i] = resolver.Resolve(new ResolutionBuilder()
-                        .SetInterfaceType(parameterInfo.ParameterType)
-                        .Build());
+                    // If the parameter type is IContainer just set it directly.
+                    if (parameterInfo.ParameterType == typeof(IContainer))
+                    {
+                        parameters[i] = container;
+                    }
+                    // Else resolve it.
+                    else
+                    {
+                        var resolution = new ResolutionBuilder
+                        {
+                            InterfaceType = parameterInfo.ParameterType,
+                        }
+                        .Build();
+
+                        parameters[i] = container.Resolve(resolution);
+                    }
+
                     continue;
                 }
             }
 
             // TODO refactore this.
 
-            IList<ParameterInjection> unnamedParameterInjections = typeRegistration.Registration.ParameterInjections
-                .UnnameParameterInjections().ToList();
+            IList<ParameterInjection> unnamedParameterInjections = parameterInjections
+                .UnnameParameterInjections()
+                .ToList();
 
             // This loop will try the best to set the remaining parameters.
             for (int i = 0; i < parameters.Length; i++)
@@ -175,86 +230,79 @@ namespace Odyssey.Core
                 unnamedParameterInjections.RemoveAt(0);
             }
 
-            // Try to instantiate it.
+            return parameters;
+        }
+
+        /// <summary>
+        /// Instantiate the service.
+        /// </summary>
+        /// <param name="type">Type of object to create.</param>
+        /// <param name="parameters">Parameters to inject.</param>
+        /// <returns>Instance of the service.</returns>
+        object InstantiateService(Type type, object[] parameters)
+        {
+#if DEBUG
+            DebugInstantiateService(type, parameters);
+#endif
+
             try
             {
                 if (parameters.Length == 0)
                 {
-                    instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+                    return Activator.CreateInstance(type);
                 }
                 else
                 {
-                    instance = Activator.CreateInstance(
-                        typeRegistration.Registration.ImplementationType,
-                        parameters);
+                    return Activator.CreateInstance(type, parameters);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new InstantiationException();
             }
-
-            // TODO
-            /*
-            foreach (PropertyInfo propertyInfo in PropertyInfos)
-            {
-                Resolution resolution = new ResolutionBuilder()
-                    .SetInterfaceType(propertyInfo.PropertyType)
-                    //.SetName()
-                    .Build();
-
-                propertyInfo.SetValue(instance, resolver.Resolve(resolution));
-            }*/
-
-            return instance;
         }
 
         /// <summary>
-        /// Create instance from resolution (and registration).
+        /// Setup properties.
         /// </summary>
-        /// <param name="typeRegistration"></param>
-        /// <param name="resolution"></param>
-        /// <param name="resolver"></param>
-        /// <returns>Service instance.</returns>
-        public object CreateInstanceFromResolution(TypeRegistration typeRegistration, Resolution resolution, IResolver resolver)
+        /// <param name="properties"></param>
+        /// <param name="container"></param>
+        /// <param name="instance"></param>
+        /// <param name="propertyInjections"></param>
+        void SetupProperties(PropertyInfo[] properties, IContainer container, object instance, IEnumerable<PropertyInjection> propertyInjections)
         {
-            object instance = null;
-
-            // If paramter injections are defined in the resolution,
-            // then use them.
-            if (resolution.ParameterInjections != null)
+            foreach (PropertyInfo property in properties)
             {
-                instance = Activator.CreateInstance(
-                    typeRegistration.Registration.ImplementationType,
-                    resolution.ParameterInjections.Select(par => par.Value).ToArray());
-            }
-            // If not, take them from the registration.
-            else
-            {
-                if (typeRegistration.Registration.ParameterInjections == null)
+                if (propertyInjections.TryGetPropertyInjection(property, out PropertyInjection propertyInjection))
                 {
-                    instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+                    property.SetValue(instance, propertyInjection.Value, null);
                 }
                 else
                 {
-                    instance = Activator.CreateInstance(
-                        typeRegistration.Registration.ImplementationType,
-                        typeRegistration.Registration.ParameterInjections.Select(par => par.Value).ToArray());
-                }
-            }
-
-            /*
-            foreach (PropertyInfo propertyInfo in typeRegistration.RuntimeMetaData.PropertyInfos)
-            {
-                Resolution propertyResolution = new ResolutionBuilder()
-                    .SetInterfaceType(propertyInfo.PropertyType)
-                    //.SetName()
+                    Resolution resolution = new ResolutionBuilder
+                    {
+                        InterfaceType = property.PropertyType,
+                        // TODO name
+                    }
                     .Build();
 
-                propertyInfo.SetValue(instance, resolver.Resolve(propertyResolution));
-            }*/
-
-            return instance;
+                    property.SetValue(instance, container.Resolve(resolution), null);
+                }
+            }
         }
+
+#if DEBUG
+        void DebugInstantiateService(Type type, object[] parameters)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.Append("{ ");
+            foreach (object parameter in parameters)
+                stringBuilder.Append($"'{parameter.GetType().FullName}', ");
+            stringBuilder.Append("}");
+
+            Debug.WriteLine($"Instantiating object of type '{type.FullName}' with parameters: {stringBuilder}");
+        }
+#endif
     }
 }

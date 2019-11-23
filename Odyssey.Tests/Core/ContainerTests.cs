@@ -119,7 +119,6 @@ namespace Odyssey.Tests.Core
             {
                 new Registration(
                     typeof(ICar),
-                    typeof(Bmw),
                     instance: bmw),
             };
 
@@ -329,6 +328,202 @@ namespace Odyssey.Tests.Core
 
         #region On resolution
 
+        /// <summary>
+        /// Test resolve parameters on resolution using attributes.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnResolutionWithAttributes()
+        {
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(IDisplay),
+                    typeof(BigDisplay),
+                    createOnResolve: true),
+
+                new Registration(
+                    typeof(IBattery),
+                    typeof(LithiumIonBattery),
+                    createOnResolve: true),
+
+                new Registration(
+                    typeof(ISpeaker),
+                    typeof(LoudSpeaker),
+                    createOnResolve: true),
+
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(RedLaptop),
+                    createOnResolve: true),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(typeof(ILaptop)));
+                IDisplay display = (IDisplay)container.Resolve(new Resolution(typeof(IDisplay)));
+                IBattery battery = (IBattery)container.Resolve(new Resolution(typeof(IBattery)));
+                ISpeaker speaker = (ISpeaker)container.Resolve(new Resolution(typeof(ISpeaker)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(RedLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreNotSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreNotSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreNotSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on resolution using names.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnResolutionWithNamedParameters()
+        {
+            var display = new BigDisplay();
+            var battery = new LithiumIonBattery();
+            var speaker = new LoudSpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(BlueLaptop),
+                    createOnResolve: true),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(
+                    typeof(ILaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(display, "display"),
+                        new ParameterInjection(speaker, "speaker"),
+                        new ParameterInjection(battery, "battery"),
+                    }));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(BlueLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on resolution using no names.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnResolutionWithUnnamedParameters()
+        {
+            var display = new BigDisplay();
+            var battery = new LithiumIonBattery();
+            var speaker = new LoudSpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(BlueLaptop),
+                    createOnResolve: true),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(
+                    typeof(ILaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(speaker),
+                        new ParameterInjection(battery),
+                        new ParameterInjection(display),
+                    }));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(BlueLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on resolution using mixed methods.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnResolutionWithMixedParameters()
+        {
+            var battery = new LithiumIonBattery();
+            var speaker = new HighQualitySpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                 new Registration(
+                    typeof(IDisplay),
+                    typeof(BigDisplay),
+                    createOnResolve: true),
+
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(GreenLaptop),
+                    createOnResolve: true),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(
+                    typeof(ILaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(speaker),
+                        new ParameterInjection(battery, "battery"),
+                    }));
+
+                IDisplay display = (IDisplay)container.Resolve(new Resolution(typeof(IDisplay)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(GreenLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreNotSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(HighQualitySpeaker), laptop.Speaker.GetType());
+            }
+        }
+
         #endregion
 
         #endregion
@@ -336,6 +531,48 @@ namespace Odyssey.Tests.Core
         #region Property injection tests
 
         #region On registration
+
+        /// <summary>
+        /// Test resolve parameters on registration using attributes.
+        /// </summary>
+        [TestMethod]
+        public void TestPropertyInjectionOnRegistrationWithAttributes()
+        {
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(IBattery),
+                    typeof(LithiumIonBattery)),
+
+                new Registration(
+                    typeof(ICpu),
+                    typeof(GoodCpu)),
+
+                new Registration(
+                    typeof(ISmartphone),
+                    typeof(GoodSmartphone)),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ISmartphone smartphone = (ISmartphone)container.Resolve(new Resolution(typeof(ISmartphone)));
+                ICpu cpu = (ICpu)container.Resolve(new Resolution(typeof(ICpu)));
+                IBattery battery = (IBattery)container.Resolve(new Resolution(typeof(IBattery)));
+
+                Assert.IsNotNull(smartphone);
+                Assert.AreEqual(typeof(GoodSmartphone), smartphone.GetType());
+
+                Assert.IsNotNull(smartphone.Battery);
+                Assert.AreSame(battery, smartphone.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), smartphone.Battery.GetType());
+
+                Assert.IsNotNull(smartphone.Cpu);
+                Assert.AreSame(cpu, smartphone.Cpu);
+                Assert.AreEqual(typeof(GoodCpu), smartphone.Cpu.GetType());
+            }
+        }
+
+        // TODO
 
         #endregion
 
@@ -502,6 +739,36 @@ namespace Odyssey.Tests.Core
                 Display = display;
                 Speaker = speaker;
             }
+        }
+
+        interface ISmartphone
+        {
+            /// <summary>
+            /// Cpu.
+            /// </summary>
+            [Resolve]
+            ICpu Cpu { get; set; }
+
+            /// <summary>
+            /// Battery.
+            /// </summary>
+            [Resolve]
+            IBattery Battery { get; set; }
+        }
+
+        class GoodSmartphone : ISmartphone
+        {
+            public ICpu Cpu { get; set; }
+
+            public IBattery Battery { get; set; }
+        }
+
+        interface ICpu
+        {
+        }
+
+        class GoodCpu : ICpu
+        {
         }
 
         #endregion

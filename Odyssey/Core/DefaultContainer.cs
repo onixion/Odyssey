@@ -3,6 +3,7 @@ using Odyssey.Contracts;
 using Odyssey.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Odyssey.Core
 {
@@ -22,15 +23,22 @@ namespace Odyssey.Core
         readonly IContainer parentContainer;
 
         /// <summary>
+        /// Enable debug mode.
+        /// </summary>
+        readonly bool enableDebugMode;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
-        public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
+        /// <param name="enableDebugMode">Enable debug mode.</param>
+        public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null, bool enableDebugMode = false)
         {
             typeRegistry = new TypeRegistry(registrations);
             typeRegistry.Initialize(this);
             this.parentContainer = parentContainer;
+            this.enableDebugMode = enableDebugMode;
         }
 
         /// <summary>
@@ -53,6 +61,9 @@ namespace Odyssey.Core
         public object Resolve(Resolution resolution)
         {
             if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
+
+            if (resolution.InterfaceType == typeof(IContainer))
+                return this;
 
             // Get type registration.
             if (!typeRegistry.TryResolve(resolution.InterfaceType, resolution.Name, out TypeRegistration typeRegistration))

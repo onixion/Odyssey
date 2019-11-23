@@ -32,7 +32,7 @@ namespace Odyssey.Core.Builders
         /// <returns></returns>
         public PropertyInjection Build()
         {
-            return new PropertyInjection(Value, Name);
+            return new PropertyInjection(Name, Value);
         }
     }
 }

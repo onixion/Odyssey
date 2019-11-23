@@ -11,99 +11,45 @@ namespace Odyssey.Core.Builders
     public class RegistrationBuilder
     {
         /// <summary>
-        /// Interface type.
+        /// Constructor.
         /// </summary>
-        Type interfaceType;
+        public RegistrationBuilder()
+        {
+        }
 
         /// <summary>
-        /// Set interface type.
+        /// Shortcut constructor.
         /// </summary>
-        /// <param name="interfaceType"></param>
         /// <returns>Registration builder.</returns>
-        /// <remarks>
-        /// Is required.
-        /// </remarks>
-        public RegistrationBuilder SetInterfaceType(Type interfaceType)
+        public static RegistrationBuilder New()
         {
-            this.interfaceType = interfaceType;
-            return this;
+            return new RegistrationBuilder();
         }
+
+        /// <summary>
+        /// Interface type.
+        /// </summary>
+        public Type InterfaceType { get; set; }
 
         /// <summary>
         /// Implemetnation type.
         /// </summary>
-        Type implementationType;
-
-        /// <summary>
-        /// Set implementation type.
-        /// </summary>
-        /// <param name="implementationType"></param>
-        /// <returns>Registration builder.</returns>
-        /// <remarks>
-        /// Is required.
-        /// </remarks>
-        public RegistrationBuilder SetImplementationType(Type implementationType)
-        {
-            this.implementationType = implementationType;
-            return this;
-        }
+        public Type ImplementationType { get; set; }
 
         /// <summary>
         /// Create on resolve.
         /// </summary>
-        bool createOnResolve;
-
-        /// <summary>
-        /// Set lifetime.
-        /// </summary>
-        /// <param name="createOnResolve">Create on resolve.</param>
-        /// <returns>Registration builder.</returns>
-        /// <remarks>
-        /// Is optional and default is Lifetime.CreateOnce.
-        /// </remarks>
-        public RegistrationBuilder SetCreateOnResolve(bool createOnResolve)
-        {
-            this.createOnResolve = createOnResolve;
-            return this;
-        }
+        public bool CreateOnResolve { get; set; } = false;
 
         /// <summary>
         /// Instance.
         /// </summary>
-        object instance;
-
-        /// <summary>
-        /// Set instance.
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns>Registration builder.</returns>
-        /// <remarks>
-        /// Is optional and only used when lifetime is Lifetime.CreatedOnce.
-        /// </remarks>
-        public RegistrationBuilder SetInstance(object instance)
-        {
-            this.instance = instance;
-            return this;
-        }
+        public object Instance { get; set; }
 
         /// <summary>
         /// Name.
         /// </summary>
-        string name;
-
-        /// <summary>
-        /// Set name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Is optional and used to resolve services which have the same interface type.
-        /// </remarks>
-        public RegistrationBuilder SetName(string name)
-        {
-            this.name = name;
-            return this;
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Parameter injections.
@@ -143,7 +89,14 @@ namespace Odyssey.Core.Builders
         /// <returns>Registration.</returns>
         public Registration Build()
         {
-            return new Registration(interfaceType, implementationType, createOnResolve, instance, name, parameterInjections.ToArray(), propertyInjections.ToArray());
+            return new Registration(
+                InterfaceType, 
+                ImplementationType, 
+                CreateOnResolve, 
+                Instance, 
+                Name, 
+                parameterInjections.ToArray(), 
+                propertyInjections.ToArray());
         }
     }
 }

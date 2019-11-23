@@ -45,11 +45,8 @@ namespace Odyssey.Contracts
             InterfaceType = interfaceType;
             Name = name;
 
-            if (parameterInjections != null)
-                ParameterInjections = parameterInjections.ToArray();
-
-            if (propertyInjections != null)
-                PropertyInjections = propertyInjections.ToArray();
+            ParameterInjections = parameterInjections != null ? parameterInjections.ToArray() : new ParameterInjection[0];
+            PropertyInjections = propertyInjections != null ? propertyInjections.ToArray() : new PropertyInjection[0];
         }
     }
 }

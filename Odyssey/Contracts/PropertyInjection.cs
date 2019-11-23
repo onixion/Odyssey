@@ -9,22 +9,23 @@ namespace Odyssey.Contracts
     public class PropertyInjection : ICloneable
     {
         /// <summary>
-        /// Value.
-        /// </summary>
-        public object Value { get; }
-
-        /// <summary>
         /// Name of property.
         /// </summary>
         public string Name { get; }
 
         /// <summary>
+        /// Value.
+        /// </summary>
+        public object Value { get; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="value">Value.</param>
         /// <param name="name">Name.</param>
-        public PropertyInjection(object value, string name = null)
+        /// <param name="value">Value.</param>
+        public PropertyInjection(string name, object value)
         {
+            Argument.NotNull(nameof(name), name);
             Argument.NotNull(nameof(value), value);
 
             Value = value;

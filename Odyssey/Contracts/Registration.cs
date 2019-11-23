@@ -1,5 +1,7 @@
 ﻿using Odyssey.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Odyssey.Contracts
 {
@@ -55,19 +57,16 @@ namespace Odyssey.Contracts
         /// <param name="propertyInjections"></param>
         public Registration(
             Type interfaceType, 
-            Type implementationType, 
+            Type implementationType = null, 
             bool createOnResolve = false,
             object instance = null, 
             string name = null,
-            ParameterInjection[] parameterInjections = null,
-            PropertyInjection[] propertyInjections = null)
+            IEnumerable<ParameterInjection> parameterInjections = null,
+            IEnumerable<PropertyInjection> propertyInjections = null)
         {
             InterfaceType = interfaceType;
             ImplementationType = implementationType;
             CreateOnResolve = createOnResolve;
-
-            if (!InterfaceType.IsAssignableFrom(ImplementationType))
-                throw new RegisterException($"{InterfaceType.FullName} is not assignable from {ImplementationType.FullName}.");
 
             // When create on resolve is true, many other fields make no sense.
             // This if will prevent all those cases from beeing possible.
@@ -79,26 +78,36 @@ namespace Odyssey.Contracts
                 if (name != null)
                     throw new RegisterException($"Registration can't define an name when CreateOnResolve is true.");
 
-                if (parameterInjections != null)
+                if (parameterInjections != null && parameterInjections.Any())
                     throw new RegisterException($"Registration can't define parameter injections when CreateOnResolve is true.");
 
-                if (propertyInjections != null)
+                if (propertyInjections != null && propertyInjections.Any())
                     throw new RegisterException($"Registration can't define property injections when CreateOnResolve is true.");
+
+                if (!InterfaceType.IsAssignableFrom(ImplementationType))
+                    throw new RegisterException($"{InterfaceType.FullName} is not assignable from {ImplementationType.FullName}.");
             }
             else
             {
                 Instance = instance;
                 Name = name;
 
-                if (parameterInjections != null)
-                    ParameterInjections = (ParameterInjection[])parameterInjections.Clone();
+                if (Instance != null)
+                {
+                    if (ImplementationType != null)
+                        throw new RegisterException($"Registration can't define an instance when an implementation type is defined.");
+                }
                 else
-                    ParameterInjections = new ParameterInjection[0];
+                {
+                    if (ImplementationType == null)
+                        throw new RegisterException($"Registration does not define an implementation type.");
 
-                if (propertyInjections != null)
-                    PropertyInjections = (PropertyInjection[])propertyInjections.Clone();
-                else
-                    PropertyInjections = new PropertyInjection[0];
+                    if (!InterfaceType.IsAssignableFrom(ImplementationType))
+                        throw new RegisterException($"{InterfaceType.FullName} is not assignable from {ImplementationType.FullName}.");
+                }
+
+                ParameterInjections = parameterInjections != null ? parameterInjections.ToArray() : new ParameterInjection[0];
+                PropertyInjections = propertyInjections != null ? propertyInjections.ToArray() : new PropertyInjection[0];
             }
         }
     }

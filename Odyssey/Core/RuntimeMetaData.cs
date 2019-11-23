@@ -38,13 +38,16 @@ namespace Odyssey.Core
         /// <param name="registration">Registration.</param>
         public RuntimeMetaData(Registration registration)
         {
-            ConstructorInfo = registration.ImplementationType
-                .GetConstructors()
-                .First();
+            if (registration.ImplementationType != null)
+            {
+                ConstructorInfo = registration.ImplementationType
+                    .GetConstructors()
+                    .First();
+            }
 
             PropertyInfos = registration.InterfaceType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
-                .Where(propertyInfo => propertyInfo.CustomAttributes.Any(customAttributeData => customAttributeData.AttributeType == typeof(PropertyDependency)))
+                .Where(propertyInfo => propertyInfo.CustomAttributes.Any(customAttributeData => customAttributeData.AttributeType == typeof(Resolve)))
                 .ToArray();
         }
     }

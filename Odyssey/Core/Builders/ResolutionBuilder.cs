@@ -13,40 +13,12 @@ namespace Odyssey.Core.Builders
         /// <summary>
         /// Interface type.
         /// </summary>
-        Type interfaceType;
-
-        /// <summary>
-        /// Set interface type.
-        /// </summary>
-        /// <param name="interfaceType"></param>
-        /// <returns>Resolution builder.</returns>
-        /// <remarks>
-        /// Is required.
-        /// </remarks>
-        public ResolutionBuilder SetInterfaceType(Type interfaceType)
-        {
-            this.interfaceType = interfaceType;
-            return this;
-        }
+        public Type InterfaceType { get; set; }
 
         /// <summary>
         /// Name.
         /// </summary>
-        string name;
-
-        /// <summary>
-        /// Set name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns>Resolution builder.</returns>
-        /// <remarks>
-        /// Is optional and used to resolve services which have the same interface type.
-        /// </remarks>
-        public ResolutionBuilder SetName(string name)
-        {
-            this.name = name;
-            return this;
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Parameter injections.
@@ -92,7 +64,7 @@ namespace Odyssey.Core.Builders
         /// <returns>Registration.</returns>
         public Resolution Build()
         {
-            return new Resolution(interfaceType, name, parameterInjections.ToArray(), propertyInjections.ToArray());
+            return new Resolution(InterfaceType, Name, parameterInjections.ToArray(), propertyInjections.ToArray());
         }
     }
 }

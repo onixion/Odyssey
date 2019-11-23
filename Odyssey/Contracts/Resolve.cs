@@ -15,6 +15,25 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Name.
         /// </summary>
-        public string Name { get; set; }
+        /// <remarks>
+        /// Hint for the name.
+        /// </remarks>
+        public string Name { get; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public Resolve()
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        public Resolve(string name)
+        {
+            Name = name;
+        }
     }
 }
