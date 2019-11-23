@@ -56,21 +56,6 @@ namespace Odyssey.Core.Builders
         /// <summary>
         /// Add parameter injection.
         /// </summary>
-        /// <param name="parameterName">Parameter name.</param>
-        /// <param name="value">Value of parameter.</param>
-        /// <returns>Resolution builder.</returns>
-        /// <remarks>
-        /// Is optional and only supported when life time is set to Lifetime.CreateOnce.
-        /// </remarks>
-        public ResolutionBuilder AddParameterInjection(string parameterName, object value)
-        {
-            parameterInjections.Add(new ParameterInjection(parameterName, null, value));
-            return this;
-        }
-
-        /// <summary>
-        /// Add parameter injection.
-        /// </summary>
         /// <param name="parameterInjection">Parameter injection.</param>
         /// <returns>Resolution builder.</returns>
         /// <remarks>
@@ -86,21 +71,6 @@ namespace Odyssey.Core.Builders
         /// Property injections.
         /// </summary>
         IList<PropertyInjection> propertyInjections = new List<PropertyInjection>();
-
-        /// <summary>
-        /// Add property injection.
-        /// </summary>
-        /// <param name="propertyName">Property name.</param>
-        /// <param name="value">Value of the property.</param>
-        /// <returns>Resolution builder</returns>
-        /// <remarks>
-        /// Is optional and only supported when life time is set to Lifetime.CreateOnce.
-        /// </remarks>
-        public ResolutionBuilder AddPropertyInjection(string propertyName, object value)
-        {
-            propertyInjections.Add(new PropertyInjection(propertyName, null, value));
-            return this;
-        }
 
         /// <summary>
         /// Add property injection.

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Odyssey.Utils;
+using System;
 
 namespace Odyssey.Contracts
 {
@@ -8,40 +9,29 @@ namespace Odyssey.Contracts
     public class ParameterInjection : ICloneable
     {
         /// <summary>
-        /// Name of parameter.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// Type of parameter.
-        /// </summary>
-        public Type Type { get; }
-
-        /// <summary>
         /// Value.
         /// </summary>
         public object Value { get; }
 
         /// <summary>
-        /// Constructor.
+        /// Name of parameter.
         /// </summary>
-        /// <param name="value">Value.</param>
-        public ParameterInjection(object value)
-        {
-            Value = value;
-        }
+        /// <remarks>
+        /// Is optional. Just a hint for the container.
+        /// </remarks>
+        public string Name { get; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="type"></param>
-        /// <param name="value"></param>
-        public ParameterInjection(string name, Type type, object value)
+        /// <param name="value">Value.</param>
+        /// <param name="name">Name.</param>
+        public ParameterInjection(object value, string name = null)
         {
-            Name = name;
-            Type = type;
+            Argument.NotNull(nameof(value), value);
+
             Value = value;
+            Name = name;
         }
 
         /// <summary>

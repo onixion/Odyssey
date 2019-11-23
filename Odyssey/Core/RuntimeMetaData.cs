@@ -15,6 +15,14 @@ namespace Odyssey.Core
     public class RuntimeMetaData
     {
         /// <summary>
+        /// Constructor info.
+        /// </summary>
+        /// <remarks>
+        /// We only support one constructor. Services must not have more than one constructor.
+        /// </remarks>
+        public ConstructorInfo ConstructorInfo { get; }
+
+        /// <summary>
         /// Property infos.
         /// </summary>
         public PropertyInfo[] PropertyInfos { get; }
@@ -30,6 +38,10 @@ namespace Odyssey.Core
         /// <param name="registration">Registration.</param>
         public RuntimeMetaData(Registration registration)
         {
+            ConstructorInfo = registration.ImplementationType
+                .GetConstructors()
+                .First();
+
             PropertyInfos = registration.InterfaceType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                 .Where(propertyInfo => propertyInfo.CustomAttributes.Any(customAttributeData => customAttributeData.AttributeType == typeof(PropertyDependency)))

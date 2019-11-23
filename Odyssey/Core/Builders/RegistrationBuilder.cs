@@ -113,28 +113,11 @@ namespace Odyssey.Core.Builders
         /// <summary>
         /// Add parameter injection.
         /// </summary>
-        /// <param name="parameterName">Parameter name.</param>
-        /// <param name="value">Value of parameter.</param>
+        /// <param name="parameterInjection">Parameter injection.</param>
         /// <returns>Registration builder.</returns>
-        /// <remarks>
-        /// Is optional and only supported when life time is set to Lifetime.CreateOnce.
-        /// </remarks>
-        public RegistrationBuilder AddParameterInjection(string parameterName, object value)
+        public RegistrationBuilder AddParameterInjection(ParameterInjection parameterInjection)
         {
-            parameterInjections.Add(new ParameterInjection(parameterName, null, value));
-            return this;
-        }
-
-        /// <summary>
-        /// Add parameter injections.
-        /// </summary>
-        /// <param name="parameterInjections">Parameter injections.</param>
-        /// <returns>Registration builder.</returns>
-        public RegistrationBuilder AddParameterInjections(IEnumerable<ParameterInjection> parameterInjections)
-        {
-            foreach (ParameterInjection parameterInjection in parameterInjections)
-                this.parameterInjections.Add(parameterInjection);
-
+            parameterInjections.Add(parameterInjection);
             return this;
         }
 
@@ -144,30 +127,13 @@ namespace Odyssey.Core.Builders
         IList<PropertyInjection> propertyInjections = new List<PropertyInjection>();
 
         /// <summary>
-        /// Add property injection.
+        /// Property injection.
         /// </summary>
-        /// <param name="propertyName">Property name.</param>
-        /// <param name="value">Value of the property.</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Is optional and only supported when life time is set to Lifetime.CreateOnce.
-        /// </remarks>
-        public RegistrationBuilder AddPropertyInjection(string propertyName, object value)
+        /// <param name="propertyInjection">Property injection.</param>
+        /// <returns>Registrations builder.</returns>
+        public RegistrationBuilder AddPropertyInjection(PropertyInjection propertyInjection)
         {
-            propertyInjections.Add(new PropertyInjection(propertyName, null, value));
-            return this;
-        }
-
-        /// <summary>
-        /// Add property injections.
-        /// </summary>
-        /// <param name="propertyInjections">Property injections.</param>
-        /// <returns>Registration builder.</returns>
-        public RegistrationBuilder AddPropertyInjections(IEnumerable<PropertyInjection> propertyInjections)
-        {
-            foreach (PropertyInjection propertyInjection in propertyInjections)
-                this.propertyInjections.Add(propertyInjection);
-
+            propertyInjections.Add(propertyInjection);
             return this;
         }
 

@@ -129,15 +129,69 @@ namespace Odyssey.Core
         {
             object instance = null;
 
-            if(typeRegistration.Registration.ParameterInjections == null)
+            var parameterInfos = typeRegistration.RuntimeMetaData.ConstructorInfo.GetParameters();
+            var parameters = new object[parameterInfos.Length];
+
+            // This loop will first try to inject a named parameter value (if there is one).
+            // If there is none, it will try to resolve the parameter if it has the resolve attribute attached.
+            for (int i = 0; i < parameterInfos.Length; i++)
             {
-                instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+                var parameterInfo = parameterInfos[i];
+
+                // If a named parameter injection is found, use it.
+                if (typeRegistration.Registration.ParameterInjections.TryGetParameterInjection(parameterInfo, out ParameterInjection parameterInjection))
+                {
+                    parameters[i] = parameterInjection.Value;
+                    continue;
+                }
+
+                // If the parameter has the attribute, resolve it.
+                if (parameterInfo.CustomAttributes.Any(customAttributeData => customAttributeData.AttributeType == typeof(Resolve)))
+                {
+                    parameters[i] = resolver.Resolve(new ResolutionBuilder()
+                        .SetInterfaceType(parameterInfo.ParameterType)
+                        .Build());
+                    continue;
+                }
             }
-            else
+
+            // TODO refactore this.
+
+            IList<ParameterInjection> unnamedParameterInjections = typeRegistration.Registration.ParameterInjections
+                .UnnameParameterInjections().ToList();
+
+            // This loop will try the best to set the remaining parameters.
+            for (int i = 0; i < parameters.Length; i++)
             {
-                instance = Activator.CreateInstance(
-                    typeRegistration.Registration.ImplementationType,
-                    typeRegistration.Registration.ParameterInjections.Select(par => par.Value).ToArray());
+                var parameter = parameters[i];
+
+                if (parameter != null)
+                    continue;
+
+                if (unnamedParameterInjections.Count == 0)
+                    throw new InstantiationException();
+
+                parameters[i] = unnamedParameterInjections.First().Value;
+                unnamedParameterInjections.RemoveAt(0);
+            }
+
+            // Try to instantiate it.
+            try
+            {
+                if (parameters.Length == 0)
+                {
+                    instance = Activator.CreateInstance(typeRegistration.Registration.ImplementationType);
+                }
+                else
+                {
+                    instance = Activator.CreateInstance(
+                        typeRegistration.Registration.ImplementationType,
+                        parameters);
+                }
+            }
+            catch(Exception e)
+            {
+                throw new InstantiationException();
             }
 
             // TODO

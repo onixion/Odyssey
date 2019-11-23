@@ -66,6 +66,9 @@ namespace Odyssey.Contracts
             ImplementationType = implementationType;
             CreateOnResolve = createOnResolve;
 
+            if (!InterfaceType.IsAssignableFrom(ImplementationType))
+                throw new RegisterException($"{InterfaceType.FullName} is not assignable from {ImplementationType.FullName}.");
+
             // When create on resolve is true, many other fields make no sense.
             // This if will prevent all those cases from beeing possible.
             if (createOnResolve)
@@ -89,9 +92,13 @@ namespace Odyssey.Contracts
 
                 if (parameterInjections != null)
                     ParameterInjections = (ParameterInjection[])parameterInjections.Clone();
+                else
+                    ParameterInjections = new ParameterInjection[0];
 
                 if (propertyInjections != null)
                     PropertyInjections = (PropertyInjection[])propertyInjections.Clone();
+                else
+                    PropertyInjections = new PropertyInjection[0];
             }
         }
     }

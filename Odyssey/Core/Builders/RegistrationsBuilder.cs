@@ -16,12 +16,27 @@ namespace Odyssey.Core.Builders
         readonly IList<Registration> registrations = new List<Registration>();
 
         /// <summary>
+        /// Reverse order.
+        /// </summary>
+        readonly bool reverseOrder;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="reverseOrder">Reverse order.</param>
+        public RegistrationsBuilder(bool reverseOrder = false)
+        {
+            this.reverseOrder = reverseOrder;
+        }
+
+        /// <summary>
         /// Shortcut constructor.
         /// </summary>
+        /// <param name="reverseOrder">Reverse order.</param>
         /// <returns>Registration builder.</returns>
-        public static RegistrationsBuilder New()
+        public static RegistrationsBuilder New(bool reverseOrder = false)
         {
-            return new RegistrationsBuilder();
+            return new RegistrationsBuilder(reverseOrder);
         }
 
         /// <summary>
@@ -66,7 +81,7 @@ namespace Odyssey.Core.Builders
         /// <returns>Registrations.</returns>
         public IEnumerable<Registration> Build()
         {
-            return registrations.ToArray();
+            return reverseOrder ? registrations.Reverse().ToArray() : registrations.ToArray();
         }
     }
 }

@@ -2,6 +2,7 @@
 using Odyssey.Contracts;
 using Odyssey.Core;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Odyssey.Tests.Core
 {
@@ -107,62 +108,6 @@ namespace Odyssey.Tests.Core
         }
 
         /// <summary>
-        /// Test parameter injection register.
-        /// </summary>
-        [TestMethod]
-        public void TestParameterInjectionOnRegister()
-        {
-            IList<Registration> registrations = new List<Registration>
-            {
-                new Registration(
-                    typeof(IComputer), 
-                    typeof(LenovoT420),
-                    parameterInjections: new ParameterInjection[] { new ParameterInjection(new LithiumIonBattery()) }),
-            };
-
-            using (IContainer container = new DefaultContainer(registrations))
-            {
-                IComputer computer = (IComputer)container.Resolve(new Resolution(typeof(IComputer)));
-
-                Assert.IsNotNull(computer);
-                Assert.IsTrue(computer.GetType() == typeof(LenovoT420));
-
-                Assert.IsNotNull(computer.Battery);
-                Assert.IsTrue(computer.Battery.GetType() == typeof(LithiumIonBattery));
-
-                Assert.IsTrue(ReferenceEquals(computer, container.Resolve(new Resolution(typeof(IComputer)))),
-                    "Expected same references.");
-            }
-        }
-
-        /// <summary>
-        /// Test parameter injection register.
-        /// </summary>
-        [TestMethod]
-        public void TestParameterInjectionOnResolve()
-        {
-            IList<Registration> registrations = new List<Registration>
-            {
-                new Registration(
-                    typeof(IComputer),
-                    typeof(LenovoT420),
-                    true),
-            };
-
-            using (IContainer container = new DefaultContainer(registrations))
-            {
-                IComputer computer = (IComputer)container.Resolve(
-                    new Resolution(typeof(IComputer), parameterInjections: new ParameterInjection[] { new ParameterInjection(new LithiumIonBattery()) }));
-
-                Assert.IsNotNull(computer);
-                Assert.IsTrue(computer.GetType() == typeof(LenovoT420));
-
-                Assert.IsNotNull(computer.Battery);
-                Assert.IsTrue(computer.Battery.GetType() == typeof(LithiumIonBattery));
-            }
-        }
-
-        /// <summary>
         /// Test resolve from parent container.
         /// </summary>
         [TestMethod]
@@ -191,6 +136,214 @@ namespace Odyssey.Tests.Core
                 }
             }
         }
+
+        #region Parameter injection tests
+
+        #region On registration
+
+        /// <summary>
+        /// Test resolve parameters on registration using attributes.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnRegistrationWithAttributes()
+        {
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(IDisplay),
+                    typeof(BigDisplay)),
+
+                new Registration(
+                    typeof(IBattery),
+                    typeof(LithiumIonBattery)),
+
+                new Registration(
+                    typeof(ISpeaker),
+                    typeof(LoudSpeaker)),
+
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(RedLaptop)),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(typeof(ILaptop)));
+                IDisplay display = (IDisplay)container.Resolve(new Resolution(typeof(IDisplay)));
+                IBattery battery = (IBattery)container.Resolve(new Resolution(typeof(IBattery)));
+                ISpeaker speaker = (ISpeaker)container.Resolve(new Resolution(typeof(ISpeaker)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(RedLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on registration using names.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnRegistrationWithNamedParameters()
+        {
+            var display = new BigDisplay();
+            var battery = new LithiumIonBattery();
+            var speaker = new LoudSpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(BlueLaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(display, "display"),
+                        new ParameterInjection(speaker, "speaker"),
+                        new ParameterInjection(battery, "battery"),
+                    }),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(typeof(ILaptop)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(BlueLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on registration using no names.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnRegistrationWithUnnamedParameters()
+        {
+            var display = new BigDisplay();
+            var battery = new LithiumIonBattery();
+            var speaker = new LoudSpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(BlueLaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(speaker),
+                        new ParameterInjection(battery),
+                        new ParameterInjection(display),
+                    }),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(typeof(ILaptop)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(BlueLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(LoudSpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        /// <summary>
+        /// Test resolve parameters on registration using mixed methods.
+        /// </summary>
+        [TestMethod]
+        public void TestParameterInjectionOnRegistrationWithMixedParameters()
+        {
+            var battery = new LithiumIonBattery();
+            var speaker = new HighQualitySpeaker();
+
+            IList<Registration> registrations = new List<Registration>
+            {
+                 new Registration(
+                    typeof(IDisplay),
+                    typeof(BigDisplay)),
+
+                new Registration(
+                    typeof(ILaptop),
+                    typeof(GreenLaptop),
+                    parameterInjections: new ParameterInjection[]
+                    {
+                        new ParameterInjection(speaker),
+                        new ParameterInjection(battery, "battery"),
+                    }),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                ILaptop laptop = (ILaptop)container.Resolve(new Resolution(typeof(ILaptop)));
+                IDisplay display = (IDisplay)container.Resolve(new Resolution(typeof(IDisplay)));
+
+                Assert.IsNotNull(laptop);
+                Assert.AreEqual(typeof(GreenLaptop), laptop.GetType());
+
+                Assert.IsNotNull(laptop.Display);
+                Assert.AreSame(display, laptop.Display);
+                Assert.AreEqual(typeof(BigDisplay), laptop.Display.GetType());
+
+                Assert.IsNotNull(laptop.Battery);
+                Assert.AreSame(battery, laptop.Battery);
+                Assert.AreEqual(typeof(LithiumIonBattery), laptop.Battery.GetType());
+
+                Assert.IsNotNull(laptop.Speaker);
+                Assert.AreSame(speaker, laptop.Speaker);
+                Assert.AreEqual(typeof(HighQualitySpeaker), laptop.Speaker.GetType());
+            }
+        }
+
+        #endregion
+
+        #region On resolution
+
+        #endregion
+
+        #endregion
+
+        #region Property injection tests
+
+        #region On registration
+
+        #endregion
+
+        #region On resolution
+
+        #endregion
+
+        #endregion
 
         #region Test interfaces and classes
 
@@ -272,6 +425,83 @@ namespace Odyssey.Tests.Core
         /// </summary>
         class LithiumIonBattery : IBattery
         {
+        }
+
+        interface ILaptop
+        {
+            IBattery Battery { get; }
+
+            IDisplay Display { get; }
+
+            ISpeaker Speaker { get; }
+        }
+
+        interface IDisplay
+        {
+        }
+
+        class BigDisplay : IDisplay
+        {
+        }
+
+        interface ISpeaker
+        {
+        }
+
+        class LoudSpeaker : ISpeaker
+        {
+        }
+
+        class HighQualitySpeaker : ISpeaker
+        {
+        }
+
+        class RedLaptop : ILaptop
+        {
+            public IBattery Battery { get; }
+
+            public IDisplay Display { get; }
+
+            public ISpeaker Speaker { get; }
+
+            public RedLaptop([Resolve]IBattery battery, [Resolve]IDisplay display, [Resolve]ISpeaker speaker)
+            {
+                Battery = battery;
+                Display = display;
+                Speaker = speaker;
+            }
+        }
+
+        class GreenLaptop : ILaptop
+        {
+            public IBattery Battery { get; }
+
+            public IDisplay Display { get; }
+
+            public ISpeaker Speaker { get; }
+
+            public GreenLaptop([Resolve]IBattery battery, ISpeaker speaker, [Resolve]IDisplay display)
+            {
+                Battery = battery;
+                Display = display;
+                Speaker = speaker;
+            }
+        }
+
+        class BlueLaptop : ILaptop
+        {
+            public IBattery Battery { get; }
+
+            public IDisplay Display { get; }
+
+            public ISpeaker Speaker { get; }
+
+            public BlueLaptop(ISpeaker speaker, IBattery battery, IDisplay display)
+            {
+                Battery = battery;
+                Display = display;
+                Speaker = speaker;
+            }
         }
 
         #endregion
