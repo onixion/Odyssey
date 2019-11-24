@@ -46,6 +46,11 @@ namespace Odyssey.Contracts
         public PropertyInjection[] PropertyInjections { get; }
 
         /// <summary>
+        /// Decorator injection type.
+        /// </summary>
+        public Type DecoratorInjectionType { get; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="interfaceType"></param>
@@ -62,7 +67,8 @@ namespace Odyssey.Contracts
             object instance = null, 
             string name = null,
             IEnumerable<ParameterInjection> parameterInjections = null,
-            IEnumerable<PropertyInjection> propertyInjections = null)
+            IEnumerable<PropertyInjection> propertyInjections = null,
+            Type decoratorInjectionType = null)
         {
             InterfaceType = interfaceType;
             ImplementationType = implementationType;
@@ -86,6 +92,9 @@ namespace Odyssey.Contracts
 
                 if (!InterfaceType.IsAssignableFrom(ImplementationType))
                     throw new RegisterException($"{InterfaceType.FullName} is not assignable from {ImplementationType.FullName}.");
+
+                if (decoratorInjectionType != null)
+                    throw new RegisterException($"Registration can't define the decorator injection type {decoratorInjectionType.FullName}.");
             }
             else
             {
@@ -96,6 +105,9 @@ namespace Odyssey.Contracts
                 {
                     if (ImplementationType != null)
                         throw new RegisterException($"Registration can't define an instance when an implementation type is defined.");
+
+                    if (decoratorInjectionType != null)
+                        throw new RegisterException($"Registration can't define the decorator injection type {decoratorInjectionType.FullName}.");
                 }
                 else
                 {
@@ -108,6 +120,7 @@ namespace Odyssey.Contracts
 
                 ParameterInjections = parameterInjections != null ? parameterInjections.ToArray() : new ParameterInjection[0];
                 PropertyInjections = propertyInjections != null ? propertyInjections.ToArray() : new PropertyInjection[0];
+                DecoratorInjectionType = decoratorInjectionType;
             }
         }
     }

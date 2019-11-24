@@ -23,6 +23,14 @@ namespace Odyssey.Core
         public ConstructorInfo ConstructorInfo { get; }
 
         /// <summary>
+        /// Constructor info of the decorator, if any.
+        /// </summary>
+        /// <remarks>
+        /// We only support one constructor. Decorators must not have more than one constructor.
+        /// </remarks>
+        public ConstructorInfo DecoratorConstructorInfo { get; }
+
+        /// <summary>
         /// Property infos.
         /// </summary>
         public PropertyInfo[] PropertyInfos { get; }
@@ -41,6 +49,13 @@ namespace Odyssey.Core
             if (registration.ImplementationType != null)
             {
                 ConstructorInfo = registration.ImplementationType
+                    .GetConstructors()
+                    .First();
+            }
+
+            if (registration.DecoratorInjectionType != null)
+            {
+                DecoratorConstructorInfo = registration.DecoratorInjectionType
                     .GetConstructors()
                     .First();
             }

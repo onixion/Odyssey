@@ -582,6 +582,34 @@ namespace Odyssey.Tests.Core
 
         #endregion
 
+        #region Decorator injection tests
+
+        /// <summary>
+        /// Test decorator injection on registration.
+        /// </summary>
+        [TestMethod]
+        public void TestDecoratorInjectionOnRegistration()
+        {
+            IList<Registration> registrations = new List<Registration>
+            {
+                new Registration(
+                    typeof(IComputer),
+                    typeof(TestComputer),
+                    decoratorInjectionType: typeof(RubberCase)),
+            };
+
+            using (IContainer container = new DefaultContainer(registrations))
+            {
+                IComputer computer = (IComputer)container.Resolve(new Resolution(typeof(IComputer)));
+
+                Assert.IsNotNull(computer);
+                Assert.AreEqual(typeof(RubberCase), computer.GetType());
+                Assert.AreEqual(typeof(LithiumIonBattery), computer.Battery.GetType());
+            }
+        }
+
+        #endregion
+
         #region Test interfaces and classes
 
         // <summary>
@@ -647,6 +675,23 @@ namespace Odyssey.Tests.Core
             public LenovoT420(IBattery battery)
             {
                 Battery = battery;
+            }
+        }
+
+        class TestComputer : IComputer
+        {
+            public IBattery Battery { get; } = new LithiumIonBattery();
+        }
+
+        class RubberCase : IComputer
+        {
+            readonly IComputer computer;
+
+            public IBattery Battery => computer.Battery;
+
+            public RubberCase(IComputer computer)
+            {
+                this.computer = computer;
             }
         }
 
