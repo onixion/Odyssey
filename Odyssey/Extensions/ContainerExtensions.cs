@@ -13,7 +13,7 @@ namespace Odyssey.Extensions
         /// Resolve.
         /// </summary>
         /// <typeparam name="TInterface">Interface to resolve.</typeparam>
-        /// <param name="resolver">Resolver.</param>
+        /// <param name="container">Resolver.</param>
         /// <param name="name">Name.</param>
         /// <param name="parameterInjections">Parameter injections.</param>
         /// <param name="propertyInjections">Property injections.</param>

@@ -1,5 +1,5 @@
-﻿using Odyssey.Utils;
-using System;
+﻿using System;
+using Utilinator.Core;
 
 namespace Odyssey.Contracts
 {
