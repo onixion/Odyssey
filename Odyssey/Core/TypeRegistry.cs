@@ -144,26 +144,33 @@ namespace Odyssey.Core
         /// <returns>Service instance.</returns>
         public object CreateInstance(TypeRegistration typeRegistration, IContainer container, Resolution resolution = null, object serviceInstance = null)
         {
-            // Get parameters for the constructor.
-            var pars = parameters.GetParameters(typeRegistration, container, resolution, serviceInstance);
+            try
+            {
+                // Get parameters for the constructor.
+                var pars = parameters.GetParameters(typeRegistration, container, resolution, serviceInstance);
 
-            // Create instance.
-            var instance = serviceInstance == null ?
-                Activator.CreateInstance(typeRegistration.Registration.ImplementationType, pars) :
-                Activator.CreateInstance(typeRegistration.Registration.DecoratorInjectionType, pars);
+                // Create instance.
+                var instance = serviceInstance == null ?
+                    Activator.CreateInstance(typeRegistration.Registration.ImplementationType, pars) :
+                    Activator.CreateInstance(typeRegistration.Registration.DecoratorInjectionType, pars);
 
-            // Set properties of the instance.
-            propertiesSetter.SetProperties(
-                instance,
-                typeRegistration.RuntimeMetaData.PropertyInfos,
-                typeRegistration.Registration.PropertyInjections,
-                container);
+                // Set properties of the instance.
+                propertiesSetter.SetProperties(
+                    instance,
+                    typeRegistration.RuntimeMetaData.PropertyInfos,
+                    typeRegistration.Registration.PropertyInjections,
+                    container);
 
-            // Create decorator and return it instead.
-            if (typeRegistration.Registration.DecoratorInjectionType != null && serviceInstance == null)
-                return CreateInstance(typeRegistration, container, resolution, serviceInstance: instance);
+                // Create decorator and return it instead.
+                if (typeRegistration.Registration.DecoratorInjectionType != null && serviceInstance == null)
+                    return CreateInstance(typeRegistration, container, resolution, serviceInstance: instance);
 
-            return instance;
+                return instance;
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
     }
 }

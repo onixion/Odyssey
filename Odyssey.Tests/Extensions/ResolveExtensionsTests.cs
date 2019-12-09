@@ -77,9 +77,9 @@ namespace Odyssey.Tests.Extensions
                 this.createContainerFunc = createContainerFunc;
             }
 
-            public IContainer CreateContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
+            public IContainer CreateChild(IEnumerable<Registration> registrations)
             {
-                return createContainerFunc?.Invoke(registrations, parentContainer);
+                return createContainerFunc?.Invoke(registrations, this);
             }
 
             public void Dispose()

@@ -123,5 +123,13 @@ namespace Odyssey.Contracts
                 DecoratorInjectionType = decoratorInjectionType;
             }
         }
+
+        /// <summary>
+        /// To string.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Registration[{InterfaceType.Name}]";
+        }
     }
 }

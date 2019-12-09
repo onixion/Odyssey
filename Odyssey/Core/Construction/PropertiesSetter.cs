@@ -39,7 +39,7 @@ namespace Odyssey.Core.Constructor
                     Resolution resolution = new ResolutionBuilder
                     {
                         InterfaceType = propertyInfo.PropertyType,
-                        // TODO name
+                        // TODO Name = propertyInfo.Name,
                     }
                     .Build();
 

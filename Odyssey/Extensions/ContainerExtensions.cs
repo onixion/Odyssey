@@ -1,6 +1,7 @@
 ﻿using Odyssey.Contracts;
 using Odyssey.Core.Builders;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Odyssey.Extensions
 {
@@ -12,8 +13,19 @@ namespace Odyssey.Extensions
         /// <summary>
         /// Resolve.
         /// </summary>
+        /// <param name="container">Container.</param>
+        /// <param name="registrationBuilders">Registration builders.</param>
+        /// <returns></returns>
+        public static IContainer CreateChild(this IContainer container, IEnumerable<RegistrationBuilder> registrationBuilders)
+        {
+            return container.CreateChild(registrationBuilders.Select(builder => builder.Build()));
+        }
+
+        /// <summary>
+        /// Resolve.
+        /// </summary>
         /// <typeparam name="TInterface">Interface to resolve.</typeparam>
-        /// <param name="container">Resolver.</param>
+        /// <param name="container">Container.</param>
         /// <param name="name">Name.</param>
         /// <param name="parameterInjections">Parameter injections.</param>
         /// <param name="propertyInjections">Property injections.</param>

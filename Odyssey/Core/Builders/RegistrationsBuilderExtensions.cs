@@ -21,6 +21,7 @@ namespace Odyssey.Core.Builders
         public static RegistrationsBuilder Register<TInterface, TImplementation>(
             this RegistrationsBuilder registrationsBuilder,
             string name = null,
+            object instance = null,
             IEnumerable<ParameterInjection> parameterInjections = null,
             IEnumerable<PropertyInjection> propertyInjections = null) where TImplementation : TInterface
         {
@@ -28,6 +29,8 @@ namespace Odyssey.Core.Builders
             {
                 InterfaceType = typeof(TInterface),
                 ImplementationType = typeof(TImplementation),
+                Name = name,
+                Instance = instance,
             };
 
             if (parameterInjections != null)

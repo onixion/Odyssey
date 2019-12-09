@@ -35,10 +35,11 @@ namespace Odyssey.Core
         /// <param name="enableDebugMode">Enable debug mode.</param>
         public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null, bool enableDebugMode = false)
         {
-            typeRegistry = new TypeRegistry(registrations);
-            typeRegistry.Initialize(this);
             this.parentContainer = parentContainer;
             this.enableDebugMode = enableDebugMode;
+
+            typeRegistry = new TypeRegistry(registrations);
+            typeRegistry.Initialize(this);
         }
 
         /// <summary>
@@ -47,10 +48,10 @@ namespace Odyssey.Core
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
         /// <returns>Container.</returns>
-        public IContainer CreateContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null)
+        public IContainer CreateChild(IEnumerable<Registration> registrations)
         {
             if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
-            return new DefaultContainerCreator().CreateContainer(registrations, parentContainer);
+            return new DefaultContainer(registrations, this);
         }
 
         /// <summary>
