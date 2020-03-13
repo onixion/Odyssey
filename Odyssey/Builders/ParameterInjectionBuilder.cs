@@ -1,24 +1,12 @@
 ﻿using Odyssey.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Odyssey.Core.Builders
+namespace Odyssey.Builders
 {
     /// <summary>
     /// Parameter injection builder.
     /// </summary>
     public class ParameterInjectionBuilder
     {
-        /// <summary>
-        /// Shortcut constructor.
-        /// </summary>
-        /// <returns>New parameter injection builder.</returns>
-        public static ParameterInjectionBuilder New()
-        {
-            return new ParameterInjectionBuilder();
-        }
-
         /// <summary>
         /// Name.
         /// </summary>
@@ -35,7 +23,7 @@ namespace Odyssey.Core.Builders
         /// <returns></returns>
         public ParameterInjection Build()
         {
-            return new ParameterInjection(Value, Name);
+            return new ParameterInjection(Name, Value);
         }
     }
 }

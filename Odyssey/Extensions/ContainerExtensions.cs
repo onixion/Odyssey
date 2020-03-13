@@ -1,5 +1,6 @@
-﻿using Odyssey.Contracts;
-using Odyssey.Core.Builders;
+﻿using Odyssey.Builders;
+using Odyssey.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +11,17 @@ namespace Odyssey.Extensions
     /// </summary>
     public static class ContainerExtensions
     {
+        /// <summary>
+        /// Resolve.
+        /// </summary>
+        /// <param name="container">Container.</param>
+        /// <param name="registrationBuilder">Registration builder.</param>
+        /// <returns></returns>
+        public static IContainer CreateChild(this IContainer container, RegistrationsBuilder registrationBuilder)
+        {
+            return container.CreateChild(registrationBuilder.Build());
+        }
+
         /// <summary>
         /// Resolve.
         /// </summary>
@@ -46,17 +58,65 @@ namespace Odyssey.Extensions
 
             if (parameterInjections != null)
             {
-                foreach (ParameterInjection parameterInjection in parameterInjections)
-                    resolutionBuilder.AddParameterInjection(parameterInjection);
+                //foreach (ParameterInjection parameterInjection in parameterInjections)
+                //    resolutionBuilder.AddParameterInjection(parameterInjection);
             }
 
             if (propertyInjections != null)
             {
-                foreach (PropertyInjection propertyInjection in propertyInjections)
-                    resolutionBuilder.AddPropertyInjection(propertyInjection);
+                //foreach (PropertyInjection propertyInjection in propertyInjections)
+                 //   resolutionBuilder.AddPropertyInjection(propertyInjection);
             }
 
             return (TInterface) container.Resolve(resolutionBuilder.Build());
+        }
+
+        /// <summary>
+        /// Resolve.
+        /// </summary>
+        /// <param name="container">Container.</param>
+        /// <param name="interfaceType">Interface type.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="parameterInjections">Parameter injections.</param>
+        /// <param name="propertyInjections">Property injections.</param>
+        /// <returns></returns>
+        public static object Resolve(
+            this IContainer container,
+            Type interfaceType,
+            string name = null,
+            IEnumerable<ParameterInjection> parameterInjections = null,
+            IEnumerable<PropertyInjection> propertyInjections = null)
+        {
+            var resolutionBuilder = new ResolutionBuilder
+            {
+                InterfaceType = interfaceType,
+                Name = name,
+            };
+
+            if (parameterInjections != null)
+            {
+                //foreach (ParameterInjection parameterInjection in parameterInjections)
+                //    resolutionBuilder.AddParameterInjection(parameterInjection);
+            }
+
+            if (propertyInjections != null)
+            {
+                //foreach (PropertyInjection propertyInjection in propertyInjections)
+                //    resolutionBuilder.AddPropertyInjection(propertyInjection);
+            }
+
+            return container.Resolve(resolutionBuilder);
+        }
+
+        /// <summary>
+        /// Resolve.
+        /// </summary>
+        /// <param name="container">Container.</param>
+        /// <param name="resolutionBuilder">Resolution builder.</param>
+        /// <returns>Service.</returns>
+        public static object Resolve(this IContainer container, ResolutionBuilder resolutionBuilder)
+        {
+            return container.Resolve(resolutionBuilder.Build());
         }
     }
 }

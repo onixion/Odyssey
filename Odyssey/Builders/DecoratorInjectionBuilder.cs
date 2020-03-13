@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Odyssey.Core.Builders
+namespace Odyssey.Builders
 {
     /// <summary>
-    /// Property injections builder.
+    /// Decorator injection builder.
     /// </summary>
-    public class PropertyInjectionsBuilder
+    public class DecoratorInjectionBuilder
     {
+
     }
 }

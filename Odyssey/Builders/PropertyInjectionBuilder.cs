@@ -1,21 +1,12 @@
 ﻿using Odyssey.Contracts;
 
-namespace Odyssey.Core.Builders
+namespace Odyssey.Builders
 {
     /// <summary>
     /// Property injection builder.
     /// </summary>
     public class PropertyInjectionBuilder
     {
-        /// <summary>
-        /// Shortcut constructor.
-        /// </summary>
-        /// <returns>New parameter injection builder.</returns>
-        public static PropertyInjectionBuilder New()
-        {
-            return new PropertyInjectionBuilder();
-        }
-
         /// <summary>
         /// Name.
         /// </summary>

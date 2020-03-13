@@ -22,11 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Utilinator" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Utils\" />
+    <ProjectReference Include="..\..\Utilinator\Utilinator\Utilinator.csproj" />
   </ItemGroup>
 
 </Project>

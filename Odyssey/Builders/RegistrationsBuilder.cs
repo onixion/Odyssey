@@ -2,31 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Odyssey.Core.Builders
+namespace Odyssey.Builders
 {
     /// <summary>
     /// Registrations builder.
     /// </summary>
     public class RegistrationsBuilder
     {
-        /// <summary>
-        /// Registrations.
-        /// </summary>
-        readonly IList<Registration> registrations = new List<Registration>();
-
-        /// <summary>
-        /// Reverse order.
-        /// </summary>
-        public bool ReverseOrder { get; set; } = false;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="reverseOrder">Reverse order.</param>
-        public RegistrationsBuilder()
-        {
-        }
-
         /// <summary>
         /// Shortcut constructor.
         /// </summary>
@@ -35,6 +17,13 @@ namespace Odyssey.Core.Builders
         {
             return new RegistrationsBuilder();
         }
+
+        /// <summary>
+        /// Registrations.
+        /// </summary>
+        public IEnumerable<Registration> Registrations { get; set; }
+
+        readonly IList<Registration> registrations = new List<Registration>();
 
         /// <summary>
         /// Add registration.
@@ -48,12 +37,19 @@ namespace Odyssey.Core.Builders
         }
 
         /// <summary>
+        /// Reverse order.
+        /// </summary>
+        public bool ReverseOrder { get; set; } = false;
+
+        /// <summary>
         /// Build.
         /// </summary>
         /// <returns>Registrations.</returns>
         public IEnumerable<Registration> Build()
         {
-            return ReverseOrder ? registrations.Reverse().ToArray() : registrations.ToArray();
+            var allRegistrations = Registrations != null ? Registrations.Concat(registrations) : registrations;
+
+            return ReverseOrder ? allRegistrations.Reverse().ToArray() : allRegistrations.ToArray();
         }
     }
 }

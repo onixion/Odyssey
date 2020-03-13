@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Odyssey.Contracts
 {
     /// <summary>
-    /// Container.
+    /// Container interface.
     /// </summary>
     public interface IContainer : IDisposable
     {

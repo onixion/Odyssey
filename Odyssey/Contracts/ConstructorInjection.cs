@@ -5,14 +5,14 @@ using Utilinator.Core;
 namespace Odyssey.Contracts
 {
     /// <summary>
-    /// Parameter injections.
+    /// Constructor injections.
     /// </summary>
-    public class PropertyInjections
+    public class ConstructorInjection
     {
         /// <summary>
         /// Injections.
         /// </summary>
-        public IEnumerable<PropertyInjection> Injections { get; }
+        public IEnumerable<ParameterInjection> Injections { get; }
 
         /// <summary>
         /// Injection behaviour.
@@ -24,7 +24,7 @@ namespace Odyssey.Contracts
         /// </summary>
         /// <param name="injections"></param>
         /// <param name="injectionBehaviour"></param>
-        public PropertyInjections(IEnumerable<PropertyInjection> injections, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
+        public ConstructorInjection(IEnumerable<ParameterInjection> injections, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
         {
             Argument.NotNull(nameof(injections), injections);
 

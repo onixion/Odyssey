@@ -24,14 +24,15 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="value">Value.</param>
         /// <param name="name">Name.</param>
-        public ParameterInjection(object value, string name = null)
+        /// <param name="value">Value.</param>
+        public ParameterInjection(string name, object value)
         {
+            Argument.NotNull(nameof(name), name);
             Argument.NotNull(nameof(value), value);
 
-            Value = value;
             Name = name;
+            Value = value;
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using Utilinator.Core;
 
 namespace Odyssey.Contracts
 {
@@ -17,36 +16,29 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Name.
         /// </summary>
-        public string Name { get; }
+        public Optional<string> Name { get; }
 
         /// <summary>
-        /// Parameter injections.
+        /// Injections.
         /// </summary>
-        public IEnumerable<ParameterInjection> ParameterInjections { get; }
-
-        /// <summary>
-        /// Property injections.
-        /// </summary>
-        public IEnumerable<PropertyInjection> PropertyInjections { get; }
+        public Optional<Injections> Injections { get; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="interfaceType"></param>
         /// <param name="name"></param>
-        /// <param name="parameterInjections"></param>
-        /// <param name="propertyInjections"></param>
+        /// <param name="injections"></param>
         public Resolution(
             Type interfaceType, 
             string name = null, 
-            IEnumerable<ParameterInjection> parameterInjections = null,
-            IEnumerable<PropertyInjection> propertyInjections = null)
+            Injections injections = null)
         {
+            Argument.NotNull(nameof(interfaceType), interfaceType);
+
             InterfaceType = interfaceType;
             Name = name;
-
-            ParameterInjections = parameterInjections != null ? parameterInjections.ToArray() : new ParameterInjection[0];
-            PropertyInjections = propertyInjections != null ? propertyInjections.ToArray() : new PropertyInjection[0];
+            Injections = injections;
         }
     }
 }

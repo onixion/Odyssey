@@ -1,4 +1,6 @@
-﻿namespace Odyssey.Contracts
+﻿using Utilinator.Core;
+
+namespace Odyssey.Contracts
 {
     /// <summary>
     /// Injections.
@@ -6,24 +8,31 @@
     public class Injections
     {
         /// <summary>
-        /// Parameter injections.
+        /// Constructor injection.
         /// </summary>
-        public ParameterInjections ParameterInjections { get; }
+        public Optional<ConstructorInjection> ConstructorInjection { get; }
 
         /// <summary>
-        /// Property injections
+        /// Property injections.
         /// </summary>
-        public PropertyInjections PropertyInjections { get; }
+        public Optional<PropertyInjections> PropertyInjections { get; }
+
+        /// <summary>
+        /// Deocrator injection.
+        /// </summary>
+        public Optional<DecoratorRegistration> DecoratorInjection { get; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="parameterInjections"></param>
+        /// <param name="constructorInjection"></param>
         /// <param name="propertyInjections"></param>
-        public Injections(ParameterInjections parameterInjections, PropertyInjections propertyInjections)
+        /// <param name="decoratorInjection"></param>
+        public Injections(ConstructorInjection constructorInjection = null, PropertyInjections propertyInjections = null, DecoratorRegistration decoratorInjection = null)
         {
-            ParameterInjections = parameterInjections;
-            PropertyInjections = propertyInjections;
+            ConstructorInjection = constructorInjection ?? new Optional<ConstructorInjection>();
+            PropertyInjections = propertyInjections ?? new Optional<PropertyInjections>();
+            DecoratorInjection = decoratorInjection ?? new Optional<DecoratorRegistration>();
         }
     }
 }

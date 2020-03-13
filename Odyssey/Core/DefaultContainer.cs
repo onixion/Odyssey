@@ -1,9 +1,6 @@
-﻿using Odyssey.Core;
-using Odyssey.Contracts;
-using Odyssey.Exceptions;
+﻿using Odyssey.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Odyssey.Core
 {
@@ -13,11 +10,6 @@ namespace Odyssey.Core
     public class DefaultContainer : IContainer
     {
         /// <summary>
-        /// Type registry.
-        /// </summary>
-        readonly TypeRegistry typeRegistry;
-
-        /// <summary>
         /// Parent container.
         /// </summary>
         readonly IContainer parentContainer;
@@ -26,6 +18,26 @@ namespace Odyssey.Core
         /// Enable debug mode.
         /// </summary>
         readonly bool enableDebugMode;
+
+        /// <summary>
+        /// Object info registry.
+        /// </summary>
+        readonly ObjectInfoRegistry objectInfoRegistry;
+
+        /// <summary>
+        /// Registration process registry.
+        /// </summary>
+        readonly RegistrationProcessRegistry registrationProcessRegistry = new RegistrationProcessRegistry();
+
+        /// <summary>
+        /// Resolution processor.
+        /// </summary>
+        readonly ResolutionProcessor resolutionProcessor;
+
+        /// <summary>
+        /// Service creator.
+        /// </summary>
+        readonly ServiceCreator serviceCreator;
 
         /// <summary>
         /// Constructor.
@@ -38,8 +50,18 @@ namespace Odyssey.Core
             this.parentContainer = parentContainer;
             this.enableDebugMode = enableDebugMode;
 
-            typeRegistry = new TypeRegistry(registrations);
-            typeRegistry.Initialize(this);
+            objectInfoRegistry = new ObjectInfoRegistry(registrations);
+
+            serviceCreator = new ServiceCreator(this, objectInfoRegistry);
+
+            resolutionProcessor = new ResolutionProcessor(registrationProcessRegistry, serviceCreator);
+
+            var registrationProcessor = new RegistrationProcessor(serviceCreator);
+            foreach (Registration registration in registrations)
+            {
+                var process = registrationProcessor.CreateProcess(registration);
+                registrationProcessRegistry.AttachProcess(process);
+            }
         }
 
         /// <summary>
@@ -62,20 +84,7 @@ namespace Odyssey.Core
         public object Resolve(Resolution resolution)
         {
             if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
-
-            if (resolution.InterfaceType == typeof(IContainer))
-                return this;
-
-            // Get type registration.
-            if (!typeRegistry.TryResolve(resolution.InterfaceType, resolution.Name, out TypeRegistration typeRegistration))
-            {
-                if (parentContainer != null)
-                    return parentContainer.Resolve(resolution);
-
-                throw new ResolveException($"Could not resolve {resolution}: matching registration not found.");
-            }
-
-            return typeRegistry.GetServiceInstance(typeRegistration, resolution, this);
+            return resolutionProcessor.Process(resolution);
         }
 
         /// <summary>
@@ -90,8 +99,6 @@ namespace Odyssey.Core
         {
             if (disposed) return;
             disposed = true;
-
-
         }
     }
 }

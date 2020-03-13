@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Odyssey.Tests.Core
 {
+    /*
     /// <summary>
     /// Test class for <see cref="Container"/>.
     /// </summary>
@@ -791,20 +792,20 @@ namespace Odyssey.Tests.Core
             /// <summary>
             /// Cpu.
             /// </summary>
-            [Resolve]
             ICpu Cpu { get; set; }
 
             /// <summary>
             /// Battery.
             /// </summary>
-            [Resolve]
             IBattery Battery { get; set; }
         }
 
         class GoodSmartphone : ISmartphone
         {
+            [Resolve]
             public ICpu Cpu { get; set; }
 
+            [Resolve]
             public IBattery Battery { get; set; }
         }
 
@@ -817,5 +818,5 @@ namespace Odyssey.Tests.Core
         }
 
         #endregion
-    }
+    }*/
 }
