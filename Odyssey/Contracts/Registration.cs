@@ -1,8 +1,5 @@
-﻿using Odyssey.Exceptions;
+﻿using GroundWork.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Utilinator.Core;
 
 namespace Odyssey.Contracts
 {
@@ -59,18 +56,19 @@ namespace Odyssey.Contracts
             Injections injections = null)
         {
             InterfaceType = interfaceType;
-            ImplementationType = implementationType;
+            ImplementationType = new Optional<Type>(implementationType);
             CreateOnResolve = createOnResolve;
-            Instance = instance;
-            Name = name;
-            Injections = injections;
-
-            Validate();
+            Instance = new Optional<object>(instance);
+            Name = new Optional<string>(name);
+            Injections = new Optional<Injections>(injections);
         }
 
-        void Validate()
+        /// <summary>
+        /// To string.
+        /// </summary>
+        public override string ToString()
         {
-            // todo?
+            return $"Registration[Interface={InterfaceType},Implementation={ImplementationType.ValueOrDefault},CreateOnResolve={CreateOnResolve}]";
         }
     }
 }

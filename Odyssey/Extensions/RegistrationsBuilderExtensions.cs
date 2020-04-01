@@ -22,8 +22,7 @@ namespace Odyssey.Extensions
         public static RegistrationsBuilder Register<TInterface, TImplementation>(
             this RegistrationsBuilder registrationsBuilder,
             string name = null,
-            IEnumerable<ParameterInjection> parameterInjections = null,
-            IEnumerable<PropertyInjection> propertyInjections = null) where TImplementation : TInterface
+            IEnumerable<ParameterInjection> parameterInjections = null) where TImplementation : TInterface
         {
             var builder = new RegistrationBuilder()
             {
@@ -37,17 +36,11 @@ namespace Odyssey.Extensions
                         Injections = parameterInjections,
                     }
                     .Build(),
-
-                    PropertyInjections = new PropertyInjectionsBuilder
-                    {
-                        Injections = propertyInjections,
-                    }
-                    .Build()
                 }
                 .Build()
             };
 
-            registrationsBuilder.Register(builder.Build());
+            registrationsBuilder.AddRegistration(builder.Build());
             return registrationsBuilder;
         }
 
@@ -63,26 +56,16 @@ namespace Odyssey.Extensions
         public static RegistrationsBuilder RegisterInstance<TInterface>(
             this RegistrationsBuilder registrationsBuilder,
             object instance,
-            string name = null,
-            IEnumerable<PropertyInjection> propertyInjections = null)
+            string name = null)
         {
             var builder = new RegistrationBuilder()
             {
                 InterfaceType = typeof(TInterface),
                 Name = name,
                 Instance = instance,
-                Injections = new InjectionsBuilder
-                {
-                    PropertyInjections = new PropertyInjectionsBuilder
-                    {
-                        Injections = propertyInjections,
-                    }
-                    .Build()
-                }
-                .Build()
             };
 
-            registrationsBuilder.Register(builder);
+            registrationsBuilder.Register(builder.Build());
             return registrationsBuilder;
         }
 
@@ -101,51 +84,19 @@ namespace Odyssey.Extensions
                 ImplementationType = typeof(TImplementation),
             };
 
-            registrationsBuilder.Register(builder);
+            registrationsBuilder.Register(builder.Build());
             return registrationsBuilder;
         }
 
         /// <summary>
-        /// Registrate builder.
+        /// Register registration.
         /// </summary>
         /// <param name="registrationsBuilder">Registrations builder.</param>
-        /// <param name="builder">Registration builder.</param>
+        /// <param name="registration">Registration.</param>
         /// <returns>Registrations builder.</returns>
-        public static RegistrationsBuilder Register(this RegistrationsBuilder registrationsBuilder, RegistrationBuilder builder)
+        public static RegistrationsBuilder Register(this RegistrationsBuilder registrationsBuilder, Registration registration)
         {
-            return registrationsBuilder.Register(builder.Build());
-        }
-
-        /// <summary>
-        /// Registrate registrations.
-        /// </summary>
-        /// <param name="registrationsBuilder">Registrations builder.</param>
-        /// <param name="registrations">Registrations.</param>
-        /// <returns>Registrations builder.</returns>
-        public static RegistrationsBuilder Register(
-            this RegistrationsBuilder registrationsBuilder, 
-            IEnumerable<Registration> registrations)
-        {
-            foreach(Registration registration in registrations)
-                return registrationsBuilder.Register(registration);
-
-            return registrationsBuilder;
-        }
-
-        /// <summary>
-        /// Registrate registrations.
-        /// </summary>
-        /// <param name="registrationsBuilder">Registrations builder.</param>
-        /// <param name="registrationBuilders">Registration builders.</param>
-        /// <returns>Registrations builder.</returns>
-        public static RegistrationsBuilder Register(
-            this RegistrationsBuilder registrationsBuilder, 
-            IEnumerable<RegistrationBuilder> registrationBuilders)
-        {
-            foreach (RegistrationBuilder registrationBuilder in registrationBuilders)
-                return registrationsBuilder.Register(registrationBuilder);
-
-            return registrationsBuilder;
+            return registrationsBuilder.AddRegistration(registration);
         }
     }
 }

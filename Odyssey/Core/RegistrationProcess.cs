@@ -1,5 +1,5 @@
-﻿using Odyssey.Contracts;
-using Utilinator.Core;
+﻿using GroundWork.Core;
+using Odyssey.Contracts;
 
 namespace Odyssey.Core
 {
@@ -30,8 +30,16 @@ namespace Odyssey.Core
         /// <param name="instance"></param>
         public RegistrationProcess(Registration registration, object instance)
         {
+            Argument.NotNull(nameof(registration), registration);
+            Argument.NotNull(nameof(instance), instance);
+
+            if (instance.GetType() == typeof(Optional<object>))
+            {
+
+            }
+
             Registration = registration;
-            Instance = instance;
+            Instance = new Optional<object>(instance);
         }
 
         /// <summary>
@@ -41,8 +49,11 @@ namespace Odyssey.Core
         /// <param name="objectInfo"></param>
         public RegistrationProcess(Registration registration, ObjectInfo objectInfo)
         {
+            Argument.NotNull(nameof(registration), registration);
+            Argument.NotNull(nameof(objectInfo), objectInfo);
+
             Registration = registration;
-            ObjectInfo = objectInfo;
+            ObjectInfo = new Optional<ObjectInfo>(objectInfo);
         }
     }
 }

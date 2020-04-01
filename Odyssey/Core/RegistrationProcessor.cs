@@ -1,4 +1,5 @@
 ﻿using Odyssey.Contracts;
+using System.Diagnostics;
 
 namespace Odyssey.Core
 {
@@ -9,13 +10,15 @@ namespace Odyssey.Core
     {
         readonly ServiceCreator serviceCreator;
 
+        readonly bool enableDebugMode;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container"></param>
-        public RegistrationProcessor(ServiceCreator serviceCreator)
+        public RegistrationProcessor(ServiceCreator serviceCreator, bool enableDebugMode)
         {
             this.serviceCreator = serviceCreator;
+            this.enableDebugMode = enableDebugMode;
         }
 
         /// <summary>
@@ -25,6 +28,12 @@ namespace Odyssey.Core
         /// <returns>Registration process.</returns>
         public RegistrationProcess CreateProcess(Registration registration)
         {
+            if (enableDebugMode)
+            {
+                Debug.WriteLine($"[{nameof(RegistrationProcessor)}] Processing registration ...");
+                Debug.WriteLine($"[{nameof(RegistrationProcessor)}] - Registration={registration}");
+            }
+
             if (registration.Instance.HasValue)
                 return new RegistrationProcess(registration, registration.Instance.Value);
 

@@ -1,5 +1,5 @@
-﻿using System;
-using Utilinator.Core;
+﻿using GroundWork.Core;
+using System;
 
 namespace Odyssey.Contracts
 {

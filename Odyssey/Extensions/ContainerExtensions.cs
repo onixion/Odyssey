@@ -45,8 +45,7 @@ namespace Odyssey.Extensions
         public static TInterface Resolve<TInterface>(
             this IContainer container, 
             string name = null, 
-            IEnumerable<ParameterInjection> parameterInjections = null,
-            IEnumerable<PropertyInjection> propertyInjections = null)
+            IEnumerable<ParameterInjection> parameterInjections = null)
         {
             var resolutionBuilder = new ResolutionBuilder
             {
@@ -58,14 +57,8 @@ namespace Odyssey.Extensions
 
             if (parameterInjections != null)
             {
-                //foreach (ParameterInjection parameterInjection in parameterInjections)
-                //    resolutionBuilder.AddParameterInjection(parameterInjection);
-            }
-
-            if (propertyInjections != null)
-            {
-                //foreach (PropertyInjection propertyInjection in propertyInjections)
-                 //   resolutionBuilder.AddPropertyInjection(propertyInjection);
+                // TODO
+                //resolutionBuilder.AddParameterInjections(parameterInjections);
             }
 
             return (TInterface) container.Resolve(resolutionBuilder.Build());
@@ -84,8 +77,7 @@ namespace Odyssey.Extensions
             this IContainer container,
             Type interfaceType,
             string name = null,
-            IEnumerable<ParameterInjection> parameterInjections = null,
-            IEnumerable<PropertyInjection> propertyInjections = null)
+            IEnumerable<ParameterInjection> parameterInjections = null)
         {
             var resolutionBuilder = new ResolutionBuilder
             {
@@ -97,12 +89,6 @@ namespace Odyssey.Extensions
             {
                 //foreach (ParameterInjection parameterInjection in parameterInjections)
                 //    resolutionBuilder.AddParameterInjection(parameterInjection);
-            }
-
-            if (propertyInjections != null)
-            {
-                //foreach (PropertyInjection propertyInjection in propertyInjections)
-                //    resolutionBuilder.AddPropertyInjection(propertyInjection);
             }
 
             return container.Resolve(resolutionBuilder);

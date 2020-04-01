@@ -16,13 +16,13 @@
     <PackageReleaseNotes>First version of Odyssey framework.</PackageReleaseNotes>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageIconUrl>https://github.com/onixion/Odyssey/blob/master/Assets/nuget_logo.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
-    <Version>1.0.7</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Utilinator\Utilinator\Utilinator.csproj" />
+    <PackageReference Include="GroundWork" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

@@ -13,9 +13,9 @@ namespace Odyssey.Builders
         public ConstructorInjection ConstructorInjection { get; set; }
 
         /// <summary>
-        /// Property injections.
+        /// Decorator injection.
         /// </summary>
-        public PropertyInjections PropertyInjections { get; set; }
+        public DecoratorRegistration DecoratorInjection { get; set; }
 
         /// <summary>
         /// Build.
@@ -23,7 +23,7 @@ namespace Odyssey.Builders
         /// <returns>Injections.</returns>
         public Injections Build()
         {
-            return new Injections(ConstructorInjection, PropertyInjections);
+            return new Injections(ConstructorInjection, DecoratorInjection);
         }
     }
 }

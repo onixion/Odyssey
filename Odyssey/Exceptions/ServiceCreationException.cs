@@ -3,21 +3,21 @@
 namespace Odyssey.Exceptions
 {
     /// <summary>
-    /// Resolve exception.
+    /// Service creation exception.
     /// </summary>
-    public class ResolveException : Exception
+    public class ServiceCreationException : Exception
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ResolveException(string message) : base(message)
+        public ServiceCreationException(string message) : base(message)
         {
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ResolveException(string message, Exception innerException) : base(message, innerException)
+        public ServiceCreationException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

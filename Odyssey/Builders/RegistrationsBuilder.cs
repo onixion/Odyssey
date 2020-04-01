@@ -10,36 +10,25 @@ namespace Odyssey.Builders
     public class RegistrationsBuilder
     {
         /// <summary>
-        /// Shortcut constructor.
-        /// </summary>
-        /// <returns>Registration builder.</returns>
-        public static RegistrationsBuilder New()
-        {
-            return new RegistrationsBuilder();
-        }
-
-        /// <summary>
         /// Registrations.
         /// </summary>
         public IEnumerable<Registration> Registrations { get; set; }
-
+  
+        /// <summary>
+        /// Registrations.
+        /// </summary>
         readonly IList<Registration> registrations = new List<Registration>();
 
         /// <summary>
         /// Add registration.
         /// </summary>
-        /// <param name="registration">Registration.</param>
+        /// <param name="registration">Registration to add.</param>
         /// <returns>Registrations builder.</returns>
-        public RegistrationsBuilder Register(Registration registration)
+        public RegistrationsBuilder AddRegistration(Registration registration)
         {
             registrations.Add(registration);
             return this;
         }
-
-        /// <summary>
-        /// Reverse order.
-        /// </summary>
-        public bool ReverseOrder { get; set; } = false;
 
         /// <summary>
         /// Build.
@@ -48,8 +37,7 @@ namespace Odyssey.Builders
         public IEnumerable<Registration> Build()
         {
             var allRegistrations = Registrations != null ? Registrations.Concat(registrations) : registrations;
-
-            return ReverseOrder ? allRegistrations.Reverse().ToArray() : allRegistrations.ToArray();
+            return allRegistrations.ToArray();
         }
     }
 }

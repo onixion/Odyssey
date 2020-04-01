@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Odyssey.Tests.Core.DefaultContainer
 {

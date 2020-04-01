@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GroundWork.Core;
+using System.Collections.Generic;
 using System.Linq;
-using Utilinator.Core;
 
 namespace Odyssey.Contracts
 {

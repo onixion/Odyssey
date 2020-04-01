@@ -6,7 +6,7 @@ namespace Odyssey.Contracts
     /// <summary>
     /// Container interface.
     /// </summary>
-    public interface IContainer : IDisposable
+    public interface IContainer
     {
         /// <summary>
         /// Create child container.

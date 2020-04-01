@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
 namespace Odyssey.Tests.Core.DefaultContainer
@@ -16,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = Container.New(new List<Registration>
             {
                 new Registration(
                     typeof(IInterface), 
@@ -25,7 +26,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
                     {
                         new ParameterInjection("number", 2),
                     }))),
-            });
+            }, true);
 
             IInterface service = (IInterface)container.Resolve(new Resolution(typeof(IInterface)));
 

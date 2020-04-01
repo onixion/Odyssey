@@ -1,5 +1,5 @@
-﻿using System;
-using Utilinator.Core;
+﻿using GroundWork.Core;
+using System;
 
 namespace Odyssey.Contracts
 {
@@ -23,8 +23,8 @@ namespace Odyssey.Contracts
         /// </summary>
         public DecoratorRegistration(Type implementationType = null, Injections injections = null)
         {
-            ImplementationType = implementationType ?? new Optional<Type>();
-            Injections = injections ?? new Optional<Injections>();
+            ImplementationType = new Optional<Type>(implementationType);
+            Injections = new Optional<Injections>(injections);
         }
     }
 }

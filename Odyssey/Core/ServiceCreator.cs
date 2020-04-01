@@ -1,5 +1,7 @@
 ﻿using Odyssey.Contracts;
+using Odyssey.Exceptions;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -20,13 +22,16 @@ namespace Odyssey.Core
         /// </summary>
         readonly ObjectInfoRegistry objectInfoRegistry;
 
+        readonly bool enableDebugMode;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ServiceCreator(IContainer container, ObjectInfoRegistry objectInfoRegistry)
+        public ServiceCreator(IContainer container, ObjectInfoRegistry objectInfoRegistry, bool enableDebugMode)
         {
             this.container = container;
             this.objectInfoRegistry = objectInfoRegistry;
+            this.enableDebugMode = enableDebugMode;
         }
 
         /// <summary>
@@ -38,9 +43,25 @@ namespace Odyssey.Core
         /// <returns>Service instace.</returns>
         public object CreateService(Type serviceType, Injections injections = null, object instance = null)
         {
+            if (enableDebugMode)
+            {
+                Debug.WriteLine($"[{nameof(ServiceCreator)}] Creating service ...");
+                Debug.WriteLine($"[{nameof(ServiceCreator)}] - ServiceType={serviceType}");
+            }
+
             var objectInfo = objectInfoRegistry.GetObjectInfo(serviceType);
 
-            var constructorArguments = GetConstructorArguments(objectInfo, injections, instance);
+            object[] constructorArguments = null;
+
+            try
+            {
+                constructorArguments = GetConstructorArguments(serviceType, objectInfo, injections, instance);
+            }
+            catch(Exception e)
+            {
+                throw new ServiceCreationException(
+                    $"Couldn't get constructor arguments for service type {serviceType}.", e);
+            }
 
             object serviceInstance;
 
@@ -55,24 +76,28 @@ namespace Odyssey.Core
             }
 
             // Set properties.
-            if (injections != null)
-            {
-                if (injections.PropertyInjections.HasValue)
-                    SetPropertyInjections(objectInfo, serviceInstance, injections.PropertyInjections.Value);
+            SetPropertyInjections(objectInfo, serviceInstance);
 
-                if (injections.DecoratorInjection.HasValue)
-                {
-                    serviceInstance = CreateService(
-                        injections.DecoratorInjection.Value.ImplementationType.Value,
-                        injections.DecoratorInjection.Value.Injections.ValueOrDefault,
-                        serviceInstance);
-                }
+            if (injections != null && injections.DecoratorInjection.HasValue)
+            {
+                serviceInstance = CreateService(
+                    injections.DecoratorInjection.Value.ImplementationType.Value,
+                    injections.DecoratorInjection.Value.Injections.ValueOrDefault,
+                    serviceInstance);
             }
 
             return serviceInstance;
         }
 
-        private object[] GetConstructorArguments(ObjectInfo objectInfo, Injections injections = null, object instance = null)
+        /// <summary>
+        /// Get constructor arguments.
+        /// </summary>
+        /// <param name="serviceType">Service type.</param>
+        /// <param name="objectInfo">Object info for the given service type.</param>
+        /// <param name="injections">Injections that shall be performed on the instance.</param>
+        /// <param name="innerInstance">Inner instance (used for decorator injection).</param>
+        /// <returns>Constructor arguments.</returns>
+        private object[] GetConstructorArguments(Type serviceType, ObjectInfo objectInfo, Injections injections = null, object innerInstance = null)
         {
             var parameters = objectInfo.ConstructorInfo.GetParameters();
             var injectedArguments = new object[parameters.Length];
@@ -83,13 +108,24 @@ namespace Odyssey.Core
                 { 
                     var constructorInjection = injections.ConstructorInjection.Value;
 
-                    foreach (ParameterInjection parameterInjection in constructorInjection.Injections)
+                    // Go through the parameters we got from the constructor.
+                    for (int i = 0; i < parameters.Length; i++)
                     {
-                        for (int i = 0; i < parameters.Length; i++)
+                        // All IContainer types are always set to the current container.
+                        if (parameters[i].GetType() == typeof(IContainer))
+                        {
+                            injectedArguments[i] = container;
+                            continue;
+                        }
+
+                        foreach (ParameterInjection parameterInjection in constructorInjection.Injections)
                         {
                             if (parameterInjection.Name == parameters[i].Name)
                             {
-                                // TODO check type.
+                                if (!parameterInjection.Value.GetType().IsAssignableFrom(parameters[i].ParameterType))
+                                    throw new ServiceCreationException(
+                                        $"Can't cast type {parameterInjection.Value.GetType()} to {parameters[i].ParameterType}.");
+
                                 injectedArguments[i] = parameterInjection.Value;
                                 break;
                             }
@@ -99,20 +135,27 @@ namespace Odyssey.Core
             }
 
             // Overwrite injection arguments in order to inject the original instance.
-            if (instance != null)
+            if (innerInstance != null)
             {
-                injectedArguments[0] = instance;
+                injectedArguments[0] = innerInstance;
             }
 
             if (injections == null || 
-                (injections.ConstructorInjection.HasValue && injections.ConstructorInjection.Value.InjectionBehaviour == InjectionBehaviour.Default))
+               (injections.ConstructorInjection.HasValue && injections.ConstructorInjection.Value.InjectionBehaviour == InjectionBehaviour.Default))
             {
                 for (int i = 0; i < injectedArguments.Length; i++)
                 {
                     if (injectedArguments[i] == null)
                     {
-                        // TODO Check name in resolve.
-                        injectedArguments[i] = container.Resolve(new Resolution(parameters[i].ParameterType));
+                        try
+                        {
+                            injectedArguments[i] = container.Resolve(new Resolution(parameters[i].ParameterType));
+                        }
+                        catch(Exception e)
+                        {
+                            throw new ResolveException(
+                                $"Couldn't resolve the parameter of {parameters[i].ParameterType} for the constructor of {serviceType}.", e);
+                        }
                     }
                 }
             }
@@ -120,29 +163,16 @@ namespace Odyssey.Core
             return injectedArguments;
         }
 
-        private void SetPropertyInjections(ObjectInfo objectInfo, object instance, PropertyInjections propertyInjections)
+        private void SetPropertyInjections(ObjectInfo objectInfo, object instance)
         {
-            if (propertyInjections.InjectionBehaviour == InjectionBehaviour.Default)
+            // Resolve property injections.
+            foreach (PropertyDetail propertyDetail in objectInfo.Properties)
             {
-                if (propertyInjections.Injections.Count() != objectInfo.PropertyInjectInfos.Length)
-                    throw new Exception("Property injection fix");
-            }
+                var propertyInfo = propertyDetail.PropertyInfo;
+                var resolution = new Resolution(propertyInfo.PropertyType, propertyDetail.Name.ValueOrDefault);
+                var resolvedPropertyInstance = container.Resolve(resolution);
 
-            foreach(PropertyInjection propertyInjection in propertyInjections.Injections)
-            {
-                foreach(PropertyInfo propertyInfo in objectInfo.PropertyInjectInfos)
-                {
-                    if (propertyInjection.Name == propertyInfo.Name)
-                    {
-                        propertyInfo.SetValue(instance, propertyInjection.Value);
-                        break;
-                    }
-                }
-            }
-
-            foreach (PropertyInfo propertyInfo in objectInfo.PropertyResolveInfos)
-            {
-                propertyInfo.SetValue(instance, container.Resolve(new Resolution(propertyInfo.PropertyType)));
+                propertyInfo.SetValue(instance, resolvedPropertyInstance);
             }
         }
     }

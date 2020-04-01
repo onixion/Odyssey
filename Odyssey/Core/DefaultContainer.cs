@@ -10,16 +10,6 @@ namespace Odyssey.Core
     public class DefaultContainer : IContainer
     {
         /// <summary>
-        /// Parent container.
-        /// </summary>
-        readonly IContainer parentContainer;
-
-        /// <summary>
-        /// Enable debug mode.
-        /// </summary>
-        readonly bool enableDebugMode;
-
-        /// <summary>
         /// Object info registry.
         /// </summary>
         readonly ObjectInfoRegistry objectInfoRegistry;
@@ -27,7 +17,7 @@ namespace Odyssey.Core
         /// <summary>
         /// Registration process registry.
         /// </summary>
-        readonly RegistrationProcessRegistry registrationProcessRegistry = new RegistrationProcessRegistry();
+        readonly RegistrationProcessRegistry registrationProcessRegistry;
 
         /// <summary>
         /// Resolution processor.
@@ -47,21 +37,32 @@ namespace Odyssey.Core
         /// <param name="enableDebugMode">Enable debug mode.</param>
         public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null, bool enableDebugMode = false)
         {
-            this.parentContainer = parentContainer;
-            this.enableDebugMode = enableDebugMode;
+            // todo: improve this
+            registrationProcessRegistry = new RegistrationProcessRegistry(
+                parentContainer != null ? ((DefaultContainer)parentContainer).registrationProcessRegistry : null,
+                enableDebugMode);
 
             objectInfoRegistry = new ObjectInfoRegistry(registrations);
+            serviceCreator = new ServiceCreator(this, objectInfoRegistry, enableDebugMode);
+            resolutionProcessor = new ResolutionProcessor(registrationProcessRegistry, serviceCreator, enableDebugMode);
 
-            serviceCreator = new ServiceCreator(this, objectInfoRegistry);
+            var registrationProcessor = new RegistrationProcessor(serviceCreator, enableDebugMode);
+            AddThisContainerToRegistrationProcessRegistry(registrationProcessor);
 
-            resolutionProcessor = new ResolutionProcessor(registrationProcessRegistry, serviceCreator);
-
-            var registrationProcessor = new RegistrationProcessor(serviceCreator);
             foreach (Registration registration in registrations)
             {
                 var process = registrationProcessor.CreateProcess(registration);
                 registrationProcessRegistry.AttachProcess(process);
             }
+        }
+
+        /// <summary>
+        /// Adds this container to the process registry.
+        /// </summary>
+        void AddThisContainerToRegistrationProcessRegistry(RegistrationProcessor registrationProcessor)
+        {
+            var process = registrationProcessor.CreateProcess(new Registration(typeof(IContainer), instance: this));
+            registrationProcessRegistry.AttachProcess(process);
         }
 
         /// <summary>
@@ -72,7 +73,6 @@ namespace Odyssey.Core
         /// <returns>Container.</returns>
         public IContainer CreateChild(IEnumerable<Registration> registrations)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
             return new DefaultContainer(registrations, this);
         }
 
@@ -83,22 +83,7 @@ namespace Odyssey.Core
         /// <returns>Service.</returns>
         public object Resolve(Resolution resolution)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(DefaultContainer));
             return resolutionProcessor.Process(resolution);
-        }
-
-        /// <summary>
-        /// Disposed.
-        /// </summary>
-        bool disposed = false;
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            if (disposed) return;
-            disposed = true;
         }
     }
 }

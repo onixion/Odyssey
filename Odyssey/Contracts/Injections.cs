@@ -1,4 +1,5 @@
-﻿using Utilinator.Core;
+﻿
+using GroundWork.Core;
 
 namespace Odyssey.Contracts
 {
@@ -13,11 +14,6 @@ namespace Odyssey.Contracts
         public Optional<ConstructorInjection> ConstructorInjection { get; }
 
         /// <summary>
-        /// Property injections.
-        /// </summary>
-        public Optional<PropertyInjections> PropertyInjections { get; }
-
-        /// <summary>
         /// Deocrator injection.
         /// </summary>
         public Optional<DecoratorRegistration> DecoratorInjection { get; }
@@ -26,13 +22,11 @@ namespace Odyssey.Contracts
         /// Constructor.
         /// </summary>
         /// <param name="constructorInjection"></param>
-        /// <param name="propertyInjections"></param>
         /// <param name="decoratorInjection"></param>
-        public Injections(ConstructorInjection constructorInjection = null, PropertyInjections propertyInjections = null, DecoratorRegistration decoratorInjection = null)
+        public Injections(ConstructorInjection constructorInjection = null, DecoratorRegistration decoratorInjection = null)
         {
-            ConstructorInjection = constructorInjection ?? new Optional<ConstructorInjection>();
-            PropertyInjections = propertyInjections ?? new Optional<PropertyInjections>();
-            DecoratorInjection = decoratorInjection ?? new Optional<DecoratorRegistration>();
+            ConstructorInjection = new Optional<ConstructorInjection>(constructorInjection);
+            DecoratorInjection = new Optional<DecoratorRegistration>(decoratorInjection);
         }
     }
 }

@@ -19,14 +19,9 @@ namespace Odyssey.Core
         public ConstructorInfo ConstructorInfo { get; }
 
         /// <summary>
-        /// Property inject infos.
+        /// Property details.
         /// </summary>
-        public PropertyInfo[] PropertyInjectInfos { get; }
-
-        /// <summary>
-        /// Property resolve infos.
-        /// </summary>
-        public PropertyInfo[] PropertyResolveInfos { get; }
+        public PropertyDetail[] Properties { get; }
 
         /// <summary>
         /// Constructor.
@@ -37,16 +32,34 @@ namespace Odyssey.Core
                 .GetConstructors()
                 .First();
 
-            PropertyInjectInfos = type
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
-                .Where(propertyInfo => propertyInfo.CustomAttributes
-                    .Any(customAttributeData => customAttributeData.AttributeType == typeof(PropertyInject)))
-                .ToArray();
+            Properties = GetPropertyDetails(type);
+        }
 
-            PropertyResolveInfos = type
+        /// <summary>
+        /// Retrieves the property infos and resolve attributes.
+        /// </summary>
+        /// <param name="type">Type to retrieve property infos from.</param>
+        /// <returns>Property details.</returns>
+        PropertyDetail[] GetPropertyDetails(Type type)
+        {
+            return type
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
-                .Where(propertyInfo => propertyInfo.CustomAttributes
-                    .Any(customAttributeData => customAttributeData.AttributeType == typeof(Resolve)))
+
+                // Map property infos to null or property details.
+                .Select(propertyInfo =>
+                {
+                    var resolveAttribute = propertyInfo.GetCustomAttribute<Resolve>();
+                    if (resolveAttribute == null)
+                        return null;
+
+                    return new PropertyDetail(
+                        propertyInfo,
+                        resolveAttribute.Name);
+                })
+
+                // Remove nulls.
+                .Where(resolveAttribute => resolveAttribute != null)
+
                 .ToArray();
         }
     }

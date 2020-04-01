@@ -18,30 +18,34 @@ namespace Odyssey.Tests.Core.DefaultContainer
         {
             IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
             {
-                new Registration(
-                    typeof(IInterface),
-                    typeof(Implementation),
-                    injections: new Injections(propertyInjections: new PropertyInjections(new List<PropertyInjection>()
-                    {
-                        new PropertyInjection("Number", 5),
-                    }))),
+                new Registration(typeof(IInterface), typeof(Implementation)),
+                new Registration(typeof(IInterface2), typeof(Implementation2)),
             });
 
-            IInterface service = (IInterface)container.Resolve(new Resolution(typeof(IInterface)));
+            IInterface2 service = (IInterface2)container.Resolve(new Resolution(typeof(IInterface2)));
 
             Assert.IsNotNull(service);
-            Assert.AreEqual(service.Number, 5);
+            Assert.IsNotNull(service.Inter);
+            Assert.IsInstanceOfType(service.Inter, typeof(IInterface));
         }
 
         interface IInterface
         {
-            int Number { get; set; }
         }
 
         class Implementation : IInterface
         {
-            [PropertyInject]
-            public int Number { get; set; }
+        }
+
+        interface IInterface2
+        {
+            IInterface Inter { get; set; }
+        }
+
+        class Implementation2 : IInterface2
+        {
+            [Resolve]
+            public IInterface Inter { get; set; }
         }
     }
 }

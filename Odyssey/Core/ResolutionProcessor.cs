@@ -1,6 +1,7 @@
 ﻿using Odyssey.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Odyssey.Core
@@ -17,13 +18,16 @@ namespace Odyssey.Core
 
         readonly ServiceCreator serviceCreator;
 
+        readonly bool enableDebugMode;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ResolutionProcessor(RegistrationProcessRegistry registrationProcessRegistry, ServiceCreator serviceCreator)
+        public ResolutionProcessor(RegistrationProcessRegistry registrationProcessRegistry, ServiceCreator serviceCreator, bool enableDebugMode)
         {
             this.registrationProcessRegistry = registrationProcessRegistry;
             this.serviceCreator = serviceCreator;
+            this.enableDebugMode = enableDebugMode;
         }
 
         /// <summary>
@@ -33,6 +37,12 @@ namespace Odyssey.Core
         /// <returns>Service instance.</returns>
         public object Process(Resolution resolution)
         {
+            if (enableDebugMode)
+            {
+                Debug.WriteLine($"[{nameof(ResolutionProcessor)}] Processing resolution ...");
+                Debug.WriteLine($"[{nameof(ResolutionProcessor)}] - Resolution={resolution}");
+            }
+
             var registrationProcess = registrationProcessRegistry.GetProcess(
                 resolution.InterfaceType, 
                 resolution.Name.HasValue ? resolution.Name.Value : "");

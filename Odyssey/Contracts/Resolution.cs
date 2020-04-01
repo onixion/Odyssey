@@ -1,5 +1,5 @@
-﻿using System;
-using Utilinator.Core;
+﻿using GroundWork.Core;
+using System;
 
 namespace Odyssey.Contracts
 {
@@ -37,8 +37,16 @@ namespace Odyssey.Contracts
             Argument.NotNull(nameof(interfaceType), interfaceType);
 
             InterfaceType = interfaceType;
-            Name = name;
-            Injections = injections;
+            Name = new Optional<string>(name);
+            Injections = new Optional<Injections>(injections);
+        }
+
+        /// <summary>
+        /// To string.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Resolution[Interface={InterfaceType},Name={Name.ValueOrDefault}]";
         }
     }
 }
