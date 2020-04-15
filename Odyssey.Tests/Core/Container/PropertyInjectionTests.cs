@@ -1,8 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Property injection tests.
@@ -16,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation)),
                 new Registration(typeof(IInterface2), typeof(Implementation2)),
@@ -44,7 +45,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
 
         class Implementation2 : IInterface2
         {
-            [Resolve]
+            [ResolveInfo]
             public IInterface Inter { get; set; }
         }
     }

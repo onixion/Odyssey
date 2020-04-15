@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Odyssey.Exceptions
 {
@@ -22,7 +20,7 @@ namespace Odyssey.Exceptions
         public static RegistrationNotFoundException New(Type interfaceType, string name)
         {
             return new RegistrationNotFoundException(
-                $"Couldn't find a registration for interface type {interfaceType} and name '{name}'.");
+                $"Could not find a registration for interface type {interfaceType.FullName} and name '{name}'.");
         }
     }
 }

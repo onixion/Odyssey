@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Odyssey.Contracts
 {
@@ -16,7 +15,7 @@ namespace Odyssey.Contracts
         IContainer CreateChild(IEnumerable<Registration> registrations);
 
         /// <summary>
-        /// Resolve for resolution.
+        /// Resolve the given resolution.
         /// </summary>
         /// <param name="resolution">Resolution.</param>
         /// <returns>Service.</returns>

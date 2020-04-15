@@ -1,12 +1,13 @@
 ﻿
 using GroundWork.Core;
+using Odyssey.Core;
 
 namespace Odyssey.Contracts
 {
     /// <summary>
     /// Injections.
     /// </summary>
-    public class Injections
+    public class Injections : IInjections
     {
         /// <summary>
         /// Constructor injection.

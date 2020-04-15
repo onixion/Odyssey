@@ -2,7 +2,7 @@
 using Odyssey.Contracts;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Decorator injection tests.
@@ -16,7 +16,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new Odyssey.Core.OdysseyContainer(new List<Registration>
             {
                 new Registration(
                     typeof(IInterface),

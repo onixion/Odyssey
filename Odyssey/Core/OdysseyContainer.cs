@@ -1,13 +1,12 @@
 ﻿using Odyssey.Contracts;
-using System;
 using System.Collections.Generic;
 
 namespace Odyssey.Core
 {
     /// <summary>
-    /// Implementation of smart container.
+    /// Default implementation of the <see cref="IContainer"/>.
     /// </summary>
-    public class DefaultContainer : IContainer
+    public class OdysseyContainer : IContainer
     {
         /// <summary>
         /// Object info registry.
@@ -35,20 +34,27 @@ namespace Odyssey.Core
         /// <param name="registrations">Registrations.</param>
         /// <param name="parentContainer">Optional parent container.</param>
         /// <param name="enableDebugMode">Enable debug mode.</param>
-        public DefaultContainer(IEnumerable<Registration> registrations, IContainer parentContainer = null, bool enableDebugMode = false)
+        public OdysseyContainer(IEnumerable<Registration> registrations, OdysseyContainer parentContainer = null, bool enableDebugMode = false)
         {
-            // todo: improve this
+            // Setup registration process registry.
             registrationProcessRegistry = new RegistrationProcessRegistry(
-                parentContainer != null ? ((DefaultContainer)parentContainer).registrationProcessRegistry : null,
+                parentContainer != null ? parentContainer.registrationProcessRegistry : null,
                 enableDebugMode);
 
+            // Setup object info registry.
             objectInfoRegistry = new ObjectInfoRegistry(registrations);
+
+            // Setup service creator.
             serviceCreator = new ServiceCreator(this, objectInfoRegistry, enableDebugMode);
+
+            // Setup resolution processor.
             resolutionProcessor = new ResolutionProcessor(registrationProcessRegistry, serviceCreator, enableDebugMode);
 
+            // Setup the registration processor.
             var registrationProcessor = new RegistrationProcessor(serviceCreator, enableDebugMode);
             AddThisContainerToRegistrationProcessRegistry(registrationProcessor);
 
+            // Add each registration to the registration process registry.
             foreach (Registration registration in registrations)
             {
                 var process = registrationProcessor.CreateProcess(registration);
@@ -73,11 +79,11 @@ namespace Odyssey.Core
         /// <returns>Container.</returns>
         public IContainer CreateChild(IEnumerable<Registration> registrations)
         {
-            return new DefaultContainer(registrations, this);
+            return new OdysseyContainer(registrations, this);
         }
 
         /// <summary>
-        /// Resolve.
+        /// Resolve the given resolution.
         /// </summary>
         /// <param name="resolution">Resolution.</param>
         /// <returns>Service.</returns>

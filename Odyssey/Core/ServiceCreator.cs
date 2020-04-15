@@ -59,8 +59,7 @@ namespace Odyssey.Core
             }
             catch(Exception e)
             {
-                throw new ServiceCreationException(
-                    $"Couldn't get constructor arguments for service type {serviceType}.", e);
+                throw new ServiceCreationException($"Couldn't get constructor arguments for service type {serviceType}.", e);
             }
 
             object serviceInstance;
@@ -122,12 +121,30 @@ namespace Odyssey.Core
                         {
                             if (parameterInjection.Name == parameters[i].Name)
                             {
-                                if (!parameterInjection.Value.GetType().IsAssignableFrom(parameters[i].ParameterType))
-                                    throw new ServiceCreationException(
-                                        $"Can't cast type {parameterInjection.Value.GetType()} to {parameters[i].ParameterType}.");
+                                // Set value.
+                                if (parameterInjection.Value.HasValue)
+                                {
+                                    if (!parameterInjection.Value.Value.GetType().IsAssignableFrom(parameters[i].ParameterType))
+                                    {
+                                        throw new ServiceCreationException($"Can't cast type {parameterInjection.Value.Value.GetType()} to {parameters[i].ParameterType}.");
+                                    }
 
-                                injectedArguments[i] = parameterInjection.Value;
-                                break;
+                                    injectedArguments[i] = parameterInjection.Value.Value;
+                                    break;
+                                }
+                                
+                                // Set resolution.
+                                if (parameterInjection.Resolution.HasValue)
+                                {
+                                    if (!parameterInjection.Resolution.Value.InterfaceType.IsAssignableFrom(parameters[i].ParameterType))
+                                    {
+                                        throw new ServiceCreationException($"Can't cast type {parameterInjection.Resolution.Value.InterfaceType} to {parameters[i].ParameterType}.");
+                                    }
+
+                                    var resolvedInjectedParameter = container.Resolve(parameterInjection.Resolution.Value);
+                                    injectedArguments[i] = resolvedInjectedParameter;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -153,8 +170,7 @@ namespace Odyssey.Core
                         }
                         catch(Exception e)
                         {
-                            throw new ResolveException(
-                                $"Couldn't resolve the parameter of {parameters[i].ParameterType} for the constructor of {serviceType}.", e);
+                            throw new ResolveException($"Couldn't resolve the parameter of {parameters[i].ParameterType} for the constructor of {serviceType}.", e);
                         }
                     }
                 }
@@ -170,7 +186,16 @@ namespace Odyssey.Core
             {
                 var propertyInfo = propertyDetail.PropertyInfo;
                 var resolution = new Resolution(propertyInfo.PropertyType, propertyDetail.Name.ValueOrDefault);
-                var resolvedPropertyInstance = container.Resolve(resolution);
+                object resolvedPropertyInstance = null;
+
+                try
+                {
+                    resolvedPropertyInstance = container.Resolve(resolution);
+                }
+                catch(Exception e)
+                {
+                    throw new ResolveException($"Could not resolve property {propertyDetail.PropertyInfo.Name} of type {propertyDetail.PropertyInfo.PropertyType}.", e);
+                }
 
                 propertyInfo.SetValue(instance, resolvedPropertyInstance);
             }

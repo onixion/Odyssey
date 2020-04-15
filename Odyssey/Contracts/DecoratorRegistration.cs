@@ -21,6 +21,8 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="implementationType">Implementation type.</param>
+        /// <param name="injections">Injections.</param>
         public DecoratorRegistration(Type implementationType = null, Injections injections = null)
         {
             ImplementationType = new Optional<Type>(implementationType);

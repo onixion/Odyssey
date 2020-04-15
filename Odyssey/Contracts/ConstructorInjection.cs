@@ -22,8 +22,8 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="injections"></param>
-        /// <param name="injectionBehaviour"></param>
+        /// <param name="injections">Parameter injections.</param>
+        /// <param name="injectionBehaviour">Injections behaviour.</param>
         public ConstructorInjection(IEnumerable<ParameterInjection> injections, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
         {
             Argument.NotNull(nameof(injections), injections);

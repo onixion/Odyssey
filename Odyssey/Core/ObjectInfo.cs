@@ -48,7 +48,7 @@ namespace Odyssey.Core
                 // Map property infos to null or property details.
                 .Select(propertyInfo =>
                 {
-                    var resolveAttribute = propertyInfo.GetCustomAttribute<Resolve>();
+                    var resolveAttribute = propertyInfo.GetCustomAttribute<ResolveInfo>();
                     if (resolveAttribute == null)
                         return null;
 

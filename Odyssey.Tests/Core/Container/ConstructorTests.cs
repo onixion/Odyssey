@@ -1,8 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Constructor tests.
@@ -16,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void ConstructorEmpty()
         {
-            new Odyssey.Core.DefaultContainer(new List<Registration> { });
+            new OdysseyContainer(new List<Registration> { });
         }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Constructor()
         {
-            new Odyssey.Core.DefaultContainer(new List<Registration>
+            new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation)),
             });

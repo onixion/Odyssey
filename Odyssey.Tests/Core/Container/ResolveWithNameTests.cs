@@ -1,8 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Resolve with name tests.
@@ -16,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation)),
                 new Registration(typeof(IInterface), typeof(Implementation2), name: "This"),
@@ -37,7 +38,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void MinimalCreateOnResolve()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation), createOnResolve: true),
                 new Registration(typeof(IInterface), typeof(Implementation2), createOnResolve: true, name: "This"),
@@ -65,7 +66,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
             IInterface originalService1 = new Implementation();
             IInterface originalService2 = new Implementation2();
 
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation), instance: originalService1),
                 new Registration(typeof(IInterface), typeof(Implementation), instance: originalService2, name: "This"),

@@ -1,9 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Mixed injections tests.
@@ -28,7 +29,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         {
             MemoryStream memoryStream = new MemoryStream();
 
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(
                     typeof(ILogger),

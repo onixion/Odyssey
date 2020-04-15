@@ -1,8 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Odyssey.Contracts;
+using Odyssey.Core;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Resolve tests.
@@ -16,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation)),
             });
@@ -32,7 +33,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void MinimalCreateOnResolve()
         {
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation), createOnResolve: true),
             });
@@ -53,7 +54,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         {
             IInterface originalService = new Implementation();
 
-            IContainer container = new Odyssey.Core.DefaultContainer(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(typeof(IInterface), typeof(Implementation), instance: originalService),
             });

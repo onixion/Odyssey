@@ -3,7 +3,7 @@ using Odyssey.Contracts;
 using Odyssey.Core;
 using System.Collections.Generic;
 
-namespace Odyssey.Tests.Core.DefaultContainer
+namespace Odyssey.Tests.Core.Container
 {
     /// <summary>
     /// Constructor injection tests.
@@ -17,7 +17,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
         [TestMethod]
         public void Minimal()
         {
-            IContainer container = Container.New(new List<Registration>
+            IContainer container = new OdysseyContainer(new List<Registration>
             {
                 new Registration(
                     typeof(IInterface), 
@@ -26,7 +26,7 @@ namespace Odyssey.Tests.Core.DefaultContainer
                     {
                         new ParameterInjection("number", 2),
                     }))),
-            }, true);
+            }, enableDebugMode: true);
 
             IInterface service = (IInterface)container.Resolve(new Resolution(typeof(IInterface)));
 

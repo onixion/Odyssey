@@ -9,17 +9,19 @@ namespace Odyssey.Contracts
     public class ParameterInjection : ICloneable
     {
         /// <summary>
-        /// Value.
-        /// </summary>
-        public object Value { get; }
-
-        /// <summary>
         /// Name of parameter.
         /// </summary>
-        /// <remarks>
-        /// Is optional. Just a hint for the container.
-        /// </remarks>
         public string Name { get; }
+
+        /// <summary>
+        /// Value.
+        /// </summary>
+        public Optional<object> Value { get; } = new Optional<object>();
+
+        /// <summary>
+        /// Resolution.
+        /// </summary>
+        public Optional<Resolution> Resolution { get; } = new Optional<Resolution>();
 
         /// <summary>
         /// Constructor.
@@ -32,7 +34,21 @@ namespace Odyssey.Contracts
             Argument.NotNull(nameof(value), value);
 
             Name = name;
-            Value = value;
+            Value = new Optional<object>(value);
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        /// <param name="resolution">Resolution.</param>
+        public ParameterInjection(string name, Resolution resolution)
+        {
+            Argument.NotNull(nameof(name), name);
+            Argument.NotNull(nameof(resolution), resolution);
+
+            Name = name;
+            Resolution = new Optional<Resolution>(resolution);
         }
 
         /// <summary>
