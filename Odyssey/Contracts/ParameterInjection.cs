@@ -1,4 +1,5 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
+using GroundWork.Contracts;
 using System;
 
 namespace Odyssey.Contracts
@@ -16,12 +17,12 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Value.
         /// </summary>
-        public Optional<object> Value { get; } = new Optional<object>();
+        public IOptional<object> Value { get; } = new Optional<object>();
 
         /// <summary>
         /// Resolution.
         /// </summary>
-        public Optional<Resolution> Resolution { get; } = new Optional<Resolution>();
+        public IOptional<Resolution> Resolution { get; } = new Optional<Resolution>();
 
         /// <summary>
         /// Constructor.

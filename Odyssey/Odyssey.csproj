@@ -15,14 +15,22 @@
     <RepositoryUrl>https://github.com/onixion/Odyssey</RepositoryUrl>
     <PackageReleaseNotes>Changed some names.</PackageReleaseNotes>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageIconUrl>https://github.com/onixion/Odyssey/blob/master/Assets/nuget_logo.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.1.4.0</AssemblyVersion>
-    <FileVersion>1.1.4.0</FileVersion>
-    <Version>1.1.4</Version>
+    <PackageIconUrl></PackageIconUrl>
+    <AssemblyVersion>1.1.5.0</AssemblyVersion>
+    <FileVersion>1.1.5.0</FileVersion>
+    <Version>1.1.5</Version>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GroundWork" Version="1.0.1" />
+    <PackageReference Include="GroundWork" Version="1.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Assets\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

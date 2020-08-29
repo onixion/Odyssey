@@ -1,4 +1,4 @@
-﻿using GroundWork.Core;
+﻿using GroundWork.Contracts;
 using Odyssey.Contracts;
 
 namespace Odyssey.Core
@@ -11,12 +11,12 @@ namespace Odyssey.Core
         /// <summary>
         /// Constructor injection.
         /// </summary>
-        public Optional<ConstructorInjection> ConstructorInjection { get; }
+        public IOptional<ConstructorInjection> ConstructorInjection { get; }
 
         /// <summary>
         /// Deocrator injection.
         /// </summary>
-        public Optional<DecoratorRegistration> DecoratorInjection { get; }
+        public IOptional<DecoratorRegistration> DecoratorInjection { get; }
 
         /// <summary>
         /// Constructor.

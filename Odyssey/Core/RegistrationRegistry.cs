@@ -1,4 +1,5 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
+using GroundWork.Contracts;
 using Odyssey.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Odyssey.Core
     {
         readonly IDictionary<Tuple<Type, string>, RegistrationProcess> typeToProcessMap = new Dictionary<Tuple<Type, string>, RegistrationProcess>();
 
-        readonly Optional<RegistrationProcessRegistry> parentRegistrationProcessRegistry;
+        readonly IOptional<RegistrationProcessRegistry> parentRegistrationProcessRegistry;
 
         readonly bool enableDebugMode;
 
@@ -61,7 +62,7 @@ namespace Odyssey.Core
 
             if (!typeToProcessMap.TryGetValue(Tuple.Create(interfaceType, name), out RegistrationProcess process))
             {
-                if (parentRegistrationProcessRegistry.HasNoValue)
+                if (!parentRegistrationProcessRegistry.HasValue)
                     throw RegistrationNotFoundException.New(interfaceType, name);
 
                 return parentRegistrationProcessRegistry.Value.GetProcess(interfaceType, name);

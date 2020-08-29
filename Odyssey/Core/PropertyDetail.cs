@@ -1,4 +1,5 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
+using GroundWork.Contracts;
 using System.Reflection;
 
 namespace Odyssey.Core
@@ -16,7 +17,7 @@ namespace Odyssey.Core
         /// <summary>
         /// Name.
         /// </summary>
-        public Optional<string> Name { get; }
+        public IOptional<string> Name { get; }
 
         /// <summary>
         /// Constructor.

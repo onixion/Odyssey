@@ -1,4 +1,5 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
+using GroundWork.Contracts;
 using Odyssey.Contracts;
 
 namespace Odyssey.Core
@@ -16,12 +17,12 @@ namespace Odyssey.Core
         /// <summary>
         /// Object info.
         /// </summary>
-        public Optional<ObjectInfo> ObjectInfo { get; } = new Optional<ObjectInfo>();
+        public IOptional<ObjectInfo> ObjectInfo { get; } = new Optional<ObjectInfo>();
 
         /// <summary>
         /// Instance.
         /// </summary>
-        public Optional<object> Instance { get; } = new Optional<object>();
+        public IOptional<object> Instance { get; } = new Optional<object>();
 
         /// <summary>
         /// Registration.
@@ -32,11 +33,6 @@ namespace Odyssey.Core
         {
             Argument.NotNull(nameof(registration), registration);
             Argument.NotNull(nameof(instance), instance);
-
-            if (instance.GetType() == typeof(Optional<object>))
-            {
-
-            }
 
             Registration = registration;
             Instance = new Optional<object>(instance);

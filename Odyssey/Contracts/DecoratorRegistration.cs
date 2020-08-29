@@ -1,4 +1,5 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
+using GroundWork.Contracts;
 using System;
 
 namespace Odyssey.Contracts
@@ -11,12 +12,12 @@ namespace Odyssey.Contracts
         /// <summary>
         /// Implementation type.
         /// </summary>
-        public Optional<Type> ImplementationType { get; }
+        public IOptional<Type> ImplementationType { get; }
 
         /// <summary>
         /// Injections.
         /// </summary>
-        public Optional<Injections> Injections { get; }
+        public IOptional<Injections> Injections { get; }
 
         /// <summary>
         /// Constructor.

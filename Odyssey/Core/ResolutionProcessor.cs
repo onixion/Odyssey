@@ -1,9 +1,6 @@
-﻿using GroundWork.Core;
+﻿using GroundWork;
 using Odyssey.Contracts;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace Odyssey.Core
 {
@@ -63,14 +60,17 @@ namespace Odyssey.Core
                 return registrationProcess.Instance.Value;
 
             Injections injections = null;
-            
+
             // If the resolution defined
             if (resolution.Injections.HasValue)
+            {
                 injections = resolution.Injections.Value;
+            }
 
             if (registrationProcess.Registration.Injections.HasValue)
+            {
                 injections = registrationProcess.Registration.Injections.Value;
-
+            }
 
             return serviceCreator.CreateService(
                 registrationProcess.Registration.ImplementationType.Value, 
